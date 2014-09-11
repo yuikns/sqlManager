@@ -1,0 +1,3 @@
+#ignore res/*
+*.txt
+*.xls
