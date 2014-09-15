@@ -6,6 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.core.SimpleAnalyzer;
+import org.apache.lucene.util.Version;
+
 import model.Org;
 import model.Publication;
 
@@ -36,9 +40,8 @@ public class OrgMetaData {
 //		omd.updateScore(omd.getOrgRankList(3), "orgtype3");
 		omd.queryPublicationById(297, 0, 1000);
 	}
-
 	public List<String> getOrgRankList(int n) {
-		List<String> res;
+		List<String> res=null;
 		BuildAllMessIndex bami = new BuildAllMessIndex();
 		try {
 			switch (n) {
@@ -50,19 +53,25 @@ public class OrgMetaData {
 				break;
 			case 3:
 				res = bami.countOrg(type3);
+				break;
 			case 4:
 				res = bami.countOrg(type4);
+				break;
 			case 5:
 				res = bami.countOrg(type5);
+				break;
 			case 6:
 				res = bami.countOrg(type6);
 				break;
 			case 7:
 				res = bami.countOrg(type7);
+				break;
 			case 8:
 				res = bami.countOrg(type8);
+				break;
 			case 9:
 				res = bami.countOrg(type9);
+				break;
 			default:
 				res = bami.countOrg();
 			}
@@ -109,7 +118,6 @@ public class OrgMetaData {
 			return null;
 		}
 	}
-
 	public List<Publication> queryPublicationById(int id, int cover, int limit) {
 		List<Publication> res = null;
 		// String[] col = { "idorg", "org", "orgClusterText" };
@@ -117,42 +125,8 @@ public class OrgMetaData {
 		if (str != null) {
 			String[] strs = str.split("\t");
 			String orgs = strs[2];
-			BuildAllMessIndex bami = new BuildAllMessIndex();
-			bami.getPubsByOrg(0, orgs);
-			switch (cover) {
-			case 1:
-				res = bami.getPubsByOrg(0, orgs, type1);
-				break;
-			case 2:
-				res = bami.getPubsByOrg(0, orgs, type2);
-				break;
-			case 3:
-				res = bami.getPubsByOrg(0, orgs, type3);
-				break;
-			case 4:
-				res = bami.getPubsByOrg(0, orgs, type4);
-				break;
-			case 5:
-				res = bami.getPubsByOrg(0, orgs, type5);
-				break;
-			case 6:
-				res = bami.getPubsByOrg(0, orgs, type6);
-				break;
-			case 7:
-				res = bami.getPubsByOrg(0, orgs, type7);
-				break;
-			case 8:
-				res = bami.getPubsByOrg(0, orgs, type8);
-				break;
-			case 9:
-				res = bami.getPubsByOrg(0, orgs, type9);
-				break;
-			case 10:
-				res = bami.getPubsByOrg(0, orgs, type10);
-				break;
-			default:
-				res = bami.getPubsByOrg(0, orgs);
-			}
+			BuildPaperCopy bc = new BuildPaperCopy();
+			res=bc.getPubsByOrg(orgs);
 		}
 		System.out.println(res.size());
 		if (limit > 0 && limit < res.size())
@@ -160,11 +134,60 @@ public class OrgMetaData {
 		else
 			return res;
 	}
+//	public List<Publication> queryPublicationById(int id, int cover, int limit) {
+//		List<Publication> res = null;
+//		// String[] col = { "idorg", "org", "orgClusterText" };
+//		String str = queryMetaById(id);
+//		if (str != null) {
+//			String[] strs = str.split("\t");
+//			String orgs = strs[2];
+//			BuildAllMessIndex bami = new BuildAllMessIndex();
+//			bami.getPubsByOrg(0, orgs);
+//			switch (cover) {
+//			case 1:
+//				res = bami.getPubsByOrg(0, orgs, type1);
+//				break;
+//			case 2:
+//				res = bami.getPubsByOrg(0, orgs, type2);
+//				break;
+//			case 3:
+//				res = bami.getPubsByOrg(0, orgs, type3);
+//				break;
+//			case 4:
+//				res = bami.getPubsByOrg(0, orgs, type4);
+//				break;
+//			case 5:
+//				res = bami.getPubsByOrg(0, orgs, type5);
+//				break;
+//			case 6:
+//				res = bami.getPubsByOrg(0, orgs, type6);
+//				break;
+//			case 7:
+//				res = bami.getPubsByOrg(0, orgs, type7);
+//				break;
+//			case 8:
+//				res = bami.getPubsByOrg(0, orgs, type8);
+//				break;
+//			case 9:
+//				res = bami.getPubsByOrg(0, orgs, type9);
+//				break;
+//			case 10:
+//				res = bami.getPubsByOrg(0, orgs, type10);
+//				break;
+//			default:
+//				res = bami.getPubsByOrg(0, orgs);
+//			}
+//		}
+//		System.out.println(res.size());
+//		if (limit > 0 && limit < res.size())
+//			return res.subList(0, limit);
+//		else
+//			return res;
+//	}
 
 	public List<String> queryOrg(int cover) {
 		List<String> util;
 		OrgrankOrgService os = new OrgrankOrgService();
-		System.out.println("!!!cover=" + cover);
 		switch (cover) {
 		case 1:
 			util = os.queryAll("orgType1");

@@ -8,6 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.BooleanClause.Occur;
+
 import model.Paper;
 import model.PaperForEva;
 import model.Publication;
@@ -36,9 +42,10 @@ public class BuildPaperCopy {
 		// bc.updateOrg();
 		// bc.updatePage();
 		// bc.evaOrgCompletity();
-//		bc.printTxtLackOrg();
+		// bc.printTxtLackOrg();
 		// bc.updateNcite();
-		 bc.doSomeInc();
+//		bc.doSomeInc();
+		bc.getPubsByOrg("Microsoft");
 	}
 
 	public void doSomeInc() {
@@ -46,16 +53,16 @@ public class BuildPaperCopy {
 		List<String> util = new Vector<String>();
 		try {
 			TxtService.getStringList("E:/za.txt", util);
-			for (int i = 0; i <util.size(); i++) {
+			for (int i = 0; i < util.size(); i++) {
 				String[] strs = util.get(i).split("\t");
-//			List<String> ids = os.queryPubByTitle(strs[0]);
-//			if(ids.size()>0){
+				// List<String> ids = os.queryPubByTitle(strs[0]);
+				// if(ids.size()>0){
 				int res = os.updateOrg(strs[0], strs[2]);
 				System.out.println(strs[0] + "\t" + res);
-//			}
-//			else{
-//				System.err.println(strs[0]);
-//			}
+				// }
+				// else{
+				// System.err.println(strs[0]);
+				// }
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -159,8 +166,7 @@ public class BuildPaperCopy {
 		for (int i = 0; i < res.size(); i++) {
 			String id = res.get(i).split("\t")[0];
 			String oldOrg = res.get(i).split("\t")[1].trim().toLowerCase();
-			String newOrg = oldOrg.replace(olds.toLowerCase(),
-					news.toLowerCase());
+			String newOrg = oldOrg.replace(olds.toLowerCase(), news.toLowerCase());
 			int re = ps.updateOrg(id, newOrg);
 			if (re > 0) {
 				System.out.println("ok " + i);
@@ -268,8 +274,7 @@ public class BuildPaperCopy {
 	void buildTable(int sheetNo) {
 		OrgrankPaperCopyService ps = new OrgrankPaperCopyService();
 		ExcelService es = new ExcelService();
-		List<Publication> pubs = es.getPubsFromExcel(
-				".\\res\\List720 - 副本.xls", sheetNo);
+		List<Publication> pubs = es.getPubsFromExcel(".\\res\\List720 - 副本.xls", sheetNo);
 		System.out.println(pubs.size());
 		for (int i = 0; i < pubs.size(); i++) {
 			Publication pub = pubs.get(i);
@@ -280,8 +285,7 @@ public class BuildPaperCopy {
 
 	void printTxtLackOrg() {
 		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(
-					".\\res\\require_org.txt"));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(".\\res\\require_org.txt"));
 			OrgrankPaperCopyService ps = new OrgrankPaperCopyService();
 			List<String> res = ps.checkOrg();
 			for (String a : res) {
@@ -294,6 +298,28 @@ public class BuildPaperCopy {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+	}
+
+	List<Publication> getPubsByOrg(String orgs) {
+		List<Publication> result = new Vector<Publication>();
+		OrgrankPaperCopyService ps = new OrgrankPaperCopyService();
+		String[] name = orgs.split("\t");
+		List<String> res=	ps.queryPubByOrg(name);
+		for(String str:res){
+			//String[] col =  { "idpaper","title", "jconf","year", "orgs"};
+			String[] col=str.split("\t");
+			Publication pub=new Publication();
+			pub.id=col[0];
+			pub.title=col[1];
+			pub.orgs=col[4];
+			pub.jconf=col[2];
+			pub.year=col[3];
+			result.add(pub);
+			System.out.print(pub.id+"\t");
+			System.out.println(pub.getYear());
+		}
+		return result;
 
 	}
 }
