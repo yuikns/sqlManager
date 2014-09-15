@@ -48,12 +48,14 @@ public class OrgrankPaperCopyService extends SqlService {
 		value.add(newOrg);
 		return update(dbName, tableName, value, where, "orgs");
 	}
+
 	public int updateNcite(String id, int nCite) {
 		String where = String.format("Where idpaper=%s", id);
 		List<String> value = new Vector<String>();
 		value.add(String.valueOf(nCite));
 		return update(dbName, tableName, value, where, "nCite");
 	}
+
 	public int updatePage(String id, String newPage) {
 		String where = String.format("Where idpaper=%s", id);
 		String[] cols = { "startPage", "endPage" };
@@ -76,14 +78,17 @@ public class OrgrankPaperCopyService extends SqlService {
 		String sql = "select count(idpaper),jconf,`year` from`orgranktest`.`paper_copy` where orgs=\"\" or orgs like \"%-;%\"  or orgs =\"-\" group by  jconf,`year`";
 		return queryDIY(dbName, sql, 3);
 	}
+
 	public List<String> checkOrg() {
 		String sql = "select idpaper,title,authors,orgs,jconf,`year`,startpage,endpage,ncite from`orgranktest`.`paper_copy` where orgs=\"\" or orgs like \"%-;%\"  or orgs =\"-\" or orgs=null";
 		return queryDIY(dbName, sql, 9);
 	}
-	public List<String> queryLackCite(){
+
+	public List<String> queryLackCite() {
 		String sql = "select idpaper,title,`year` from`orgranktest`.`paper_copy` where ncite=-1 or ncite=\"\" or ncite=null";
 		return queryDIY(dbName, sql, 3);
 	}
+
 	public List<Publication> writeBack() {
 		String sql = "select idpaper,title,authors,orgs,jconf,`year`,startPage,endPage,nCite from`orgranktest`.`paper_copy`";
 		List<String> res = queryDIY(dbName, sql, 9);
@@ -139,7 +144,7 @@ public class OrgrankPaperCopyService extends SqlService {
 		List<String> b = queryAColByYC("endPage", year, conf);
 		List<Integer> res = findPage(a, b);
 		if (res.size() == 2) {
-			System.out.print("Á¬Ðø:");
+			System.out.print("res.size=2:");
 		}
 		for (int i = 0; i < res.size(); i++) {
 			if (i % 2 == 0)
@@ -156,36 +161,52 @@ public class OrgrankPaperCopyService extends SqlService {
 		String where = "where `idpaper` like \"%00\" and nCite=0 order by jconf,year ";
 		return query(dbName, tableName, where, col);
 	}
-	public int deleteByTitle(String title){
-		int result=0;
-		if(title!=""){
-			title=title.replace("'", "\'").trim();
-			String where=String.format("where title like \"%s%%\"", title);
-			result=delete(dbName, tableName, where);
+
+	public int deleteByTitle(String title) {
+		int result = 0;
+		if (title != "") {
+			title = title.replace("'", "\'").trim();
+			String where = String.format("where title like \"%s%%\"", title);
+			result = delete(dbName, tableName, where);
 		}
 		return result;
 	}
+
 	public List<String> queryPubByTitle(String title) {
 		String[] col = { "idpaper" };
 		String where = String.format("where `title` like'%%%s%%' ", title);
 		return query(dbName, tableName, where, col);
 	}
+
 	public List<String> queryPubByOrg(String org) {
-		String[] col = {"idpaper", "orgs" };
+		String[] col = { "idpaper", "orgs" };
 		String where = String.format("where `orgs` like'%%%s%%' ", org);
 		return query(dbName, tableName, where, col);
 	}
+
+	public List<String> queryPubByOrg(String[] orgs) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < orgs.length; i++) {
+			orgs[i].replaceAll(",", "%");
+			if (i == 0) {
+				sb.append(String.format("where (`orgs` like'%%%s%%' ) ", orgs[i]));
+			} else {
+				sb.append(String.format("or (`orgs` like'%%%s%%') ", orgs[i]));
+			}
+		}
+		String[] col = { "idpaper","title", "jconf","year", "orgs"};
+		String where =sb.toString()+" order by `year`";
+		return query(dbName, tableName, where, col);
+	}
+
 	public List<String> queryAColByYC(String col, String year, String conf) {
-		String where = String.format("where jconf='%s' and `year`=%s", conf,
-				year);
+		String where = String.format("where jconf='%s' and `year`=%s", conf, year);
 		return query(dbName, tableName, where, col);
 	}
 
 	public List<String> queryAColByYCP(String year, String conf, String person) {
 		String[] col = { "title" };
-		String where = String.format(
-				"where jconf='%s' and `year`=%s and `authors` like'%%%s%%' ",
-				conf, year, person);
+		String where = String.format("where jconf='%s' and `year`=%s and `authors` like'%%%s%%' ", conf, year, person);
 		return query(dbName, tableName, where, col);
 	}
 

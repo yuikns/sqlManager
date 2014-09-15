@@ -1,3 +1,7 @@
 #ignore res/*
 *.txt
+<<<<<<< HEAD
 *.xls
+=======
+*.xls
+>>>>>>> fa7c51945ea6467251746fd53e23509630be58b5

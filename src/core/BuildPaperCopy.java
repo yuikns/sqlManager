@@ -5,12 +5,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Vector;
+
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.BooleanClause.Occur;
 
 import model.Paper;
 import model.PaperForEva;
@@ -42,7 +44,8 @@ public class BuildPaperCopy {
 		// bc.evaOrgCompletity();
 		// bc.printTxtLackOrg();
 		// bc.updateNcite();
-		// bc.doSomeInc();
+//		bc.doSomeInc();
+		bc.getPubsByOrg("Microsoft");
 	}
 
 	public void doSomeInc() {
@@ -163,8 +166,7 @@ public class BuildPaperCopy {
 		for (int i = 0; i < res.size(); i++) {
 			String id = res.get(i).split("\t")[0];
 			String oldOrg = res.get(i).split("\t")[1].trim().toLowerCase();
-			String newOrg = oldOrg.replace(olds.toLowerCase(),
-					news.toLowerCase());
+			String newOrg = oldOrg.replace(olds.toLowerCase(), news.toLowerCase());
 			int re = ps.updateOrg(id, newOrg);
 			if (re > 0) {
 				System.out.println("ok " + i);
@@ -272,8 +274,7 @@ public class BuildPaperCopy {
 	void buildTable(int sheetNo) {
 		OrgrankPaperCopyService ps = new OrgrankPaperCopyService();
 		ExcelService es = new ExcelService();
-		List<Publication> pubs = es.getPubsFromExcel(
-				".\\res\\List720 - 副本.xls", sheetNo);
+		List<Publication> pubs = es.getPubsFromExcel(".\\res\\List720 - 副本.xls", sheetNo);
 		System.out.println(pubs.size());
 		for (int i = 0; i < pubs.size(); i++) {
 			Publication pub = pubs.get(i);
@@ -284,8 +285,7 @@ public class BuildPaperCopy {
 
 	void printTxtLackOrg() {
 		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(
-					".\\res\\require_org.txt"));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(".\\res\\require_org.txt"));
 			OrgrankPaperCopyService ps = new OrgrankPaperCopyService();
 			List<String> res = ps.checkOrg();
 			for (String a : res) {
@@ -301,76 +301,25 @@ public class BuildPaperCopy {
 
 	}
 
-	public enum Occur {
-		MUST, Should, MUST_NOT
-	}
+	List<Publication> getPubsByOrg(String orgs) {
+		List<Publication> result = new Vector<Publication>();
+		OrgrankPaperCopyService ps = new OrgrankPaperCopyService();
+		String[] name = orgs.split("\t");
+		List<String> res=	ps.queryPubByOrg(name);
+		for(String str:res){
+			//String[] col =  { "idpaper","title", "jconf","year", "orgs"};
+			String[] col=str.split("\t");
+			Publication pub=new Publication();
+			pub.id=col[0];
+			pub.title=col[1];
+			pub.orgs=col[4];
+			pub.jconf=col[2];
+			pub.year=col[3];
+			result.add(pub);
+			System.out.print(pub.id+"\t");
+			System.out.println(pub.getYear());
+		}
+		return result;
 
-	boolean termParser(String[] TermsAns, String TermsQue, Occur occur) {
-		boolean re = false;
-		Set<String> a = new HashSet<String>(Arrays.asList(TermsAns));
-		Set<String> q = new HashSet<String>(Arrays.asList(TermsQue));
-		if (occur == Occur.MUST) {
-			a.removeAll(q);
-			re = a.size() > 0 ? false : true;
-		} else if (occur == Occur.Should) {
-			int oldSize = a.size();
-			a.removeAll(q);
-			re = oldSize > a.size() ? true : false;
-		} else {
-			int oldSize = a.size();
-			a.removeAll(q);
-			re = oldSize == a.size() ? true : false;
-		}
-		return re;
-	}
-	List<Integer> findIndex(List<String> q,String term){
-		List<Integer> res=new Vector<Integer>();
-		for(int i=0;i<q.size();i++){
-			if(term.equals(q.get(i))){
-				res.add(i);
-			}
-		}
-		return res;
-	}
-	boolean phaseParser(String que, String ans, int step) {
-		boolean re = false;
-		String[] TermsAns = ans.split(" ");
-		String[] TermsQue = que.split(" ");
-		List<String> a = Arrays.asList(TermsAns);
-		List<String> q = Arrays.asList(TermsQue);
-		int start = q.indexOf(a.get(0));
-		if (start == -1)
-			return re;
-		for (String termA : a) {
-			int temp =q.indexOf(termA);
-			if (temp == -1)
-				return re;
-			if (temp - start > step)
-				return re;
-			start = temp;
-			q.set(temp, "#");
-		}
-		return true;
-	}
-
-	boolean selfMadeOrgParser(String orgQue, String orgAns) {
-		boolean re = false;
-		String[] strs = orgAns.split(",");
-		for (String str : strs) {
-			phaseParser(str, orgQue, 1);
-		}
-		return re;
-	}
-
-	void buildHashMap(List<String> orgTextList) {
-		// id \t org1 \t ...
-		HashMap<String, List<String>> a = new HashMap<String, List<String>>();
-		for (String orgText : orgTextList) {
-			String[] strs = orgText.split("\t");
-			String id = strs[0];
-			List<String> tmp = Arrays.asList(strs);
-			tmp.remove(0);
-			a.put(id, tmp);
-		}
 	}
 }
