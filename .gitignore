@@ -1,1 +1,3 @@
-res/
+#ignore res/*
+*.txt
+*.xls
