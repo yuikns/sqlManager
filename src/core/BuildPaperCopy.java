@@ -5,7 +5,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.lucene.index.Term;
@@ -28,7 +30,7 @@ public class BuildPaperCopy {
 		// TODO Auto-generated method stub
 		BuildPaperCopy bc = new BuildPaperCopy();
 		// bc.compareTitle("2004","VIS",".\\res\\pubEva\\vis20042008.xls");
-		// bc.evaTitle();
+		 bc.evaTitle();
 		// String dirPath = ".\\res\\pubEva\\txt1";
 		// File dir = new File(dirPath);
 		// for (String filePath : dir.list()) {
@@ -44,8 +46,7 @@ public class BuildPaperCopy {
 		// bc.evaOrgCompletity();
 		// bc.printTxtLackOrg();
 		// bc.updateNcite();
-//		bc.doSomeInc();
-		bc.getPubsByOrg("Microsoft");
+		// bc.doSomeInc();
 	}
 
 	public void doSomeInc() {
@@ -166,7 +167,8 @@ public class BuildPaperCopy {
 		for (int i = 0; i < res.size(); i++) {
 			String id = res.get(i).split("\t")[0];
 			String oldOrg = res.get(i).split("\t")[1].trim().toLowerCase();
-			String newOrg = oldOrg.replace(olds.toLowerCase(), news.toLowerCase());
+			String newOrg = oldOrg.replace(olds.toLowerCase(),
+					news.toLowerCase());
 			int re = ps.updateOrg(id, newOrg);
 			if (re > 0) {
 				System.out.println("ok " + i);
@@ -274,7 +276,8 @@ public class BuildPaperCopy {
 	void buildTable(int sheetNo) {
 		OrgrankPaperCopyService ps = new OrgrankPaperCopyService();
 		ExcelService es = new ExcelService();
-		List<Publication> pubs = es.getPubsFromExcel(".\\res\\List720 - 副本.xls", sheetNo);
+		List<Publication> pubs = es.getPubsFromExcel(
+				".\\res\\List720 - 副本.xls", sheetNo);
 		System.out.println(pubs.size());
 		for (int i = 0; i < pubs.size(); i++) {
 			Publication pub = pubs.get(i);
@@ -285,7 +288,8 @@ public class BuildPaperCopy {
 
 	void printTxtLackOrg() {
 		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(".\\res\\require_org.txt"));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(
+					".\\res\\require_org.txt"));
 			OrgrankPaperCopyService ps = new OrgrankPaperCopyService();
 			List<String> res = ps.checkOrg();
 			for (String a : res) {
@@ -301,23 +305,56 @@ public class BuildPaperCopy {
 
 	}
 
-	List<Publication> getPubsByOrg(String orgs) {
+	public List<Publication> getPubsByOrg(String orgs, int... year) {
 		List<Publication> result = new Vector<Publication>();
 		OrgrankPaperCopyService ps = new OrgrankPaperCopyService();
 		String[] name = orgs.split("\t");
-		List<String> res=	ps.queryPubByOrg(name);
-		for(String str:res){
-			//String[] col =  { "idpaper","title", "jconf","year", "orgs"};
-			String[] col=str.split("\t");
-			Publication pub=new Publication();
-			pub.id=col[0];
-			pub.title=col[1];
-			pub.orgs=col[4];
-			pub.jconf=col[2];
-			pub.year=col[3];
-			result.add(pub);
-			System.out.print(pub.id+"\t");
-			System.out.println(pub.getYear());
+		List<String> res = ps.queryPubByOrg(name);
+		Set<Integer> yearSet = new HashSet<Integer>();
+		for (int i = 0; i < year.length; i++) {
+			yearSet.add(year[i]);
+		}
+		for (String str : res) {
+			// String[] col = { "idpaper","title", "jconf","year", "orgs"};
+			String[] col = str.split("\t");
+			Publication pub = new Publication();
+			pub.id = col[0];
+			pub.title = col[1];
+			pub.orgs = col[4];
+			pub.jconf = col[2];
+			pub.year = col[3];
+			if (yearSet.size() == 0) {
+				result.add(pub);
+			}else if(yearSet.contains(pub.getYear())){
+				result.add(pub);
+			}
+		}
+		return result;
+
+	}
+	public List<Publication> getPubsByOrgConf(String orgs, String... conf) {
+		List<Publication> result = new Vector<Publication>();
+		OrgrankPaperCopyService ps = new OrgrankPaperCopyService();
+		String[] name = orgs.split("\t");
+		List<String> res = ps.queryPubByOrg(name);
+		Set<String> yearSet = new HashSet<String>();
+		for (int i = 0; i < conf.length; i++) {
+			yearSet.add(conf[i]);
+		}
+		for (String str : res) {
+			// String[] col = { "idpaper","title", "jconf","year", "orgs"};
+			String[] col = str.split("\t");
+			Publication pub = new Publication();
+			pub.id = col[0];
+			pub.title = col[1];
+			pub.orgs = col[4];
+			pub.jconf = col[2];
+			pub.year = col[3];
+			if (yearSet.size() == 0) {
+				result.add(pub);
+			}else if(yearSet.contains(pub.getConf())){
+				result.add(pub);
+			}
 		}
 		return result;
 

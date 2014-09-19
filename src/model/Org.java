@@ -1,5 +1,7 @@
 package model;
 
+import java.util.List;
+
 import jxl.*;
 
 public class Org {
@@ -28,7 +30,13 @@ public class Org {
 	public String getId() {
 		return this.id;
 	}
-
+	public String getNamesToString(){
+		StringBuilder sb=new StringBuilder();
+		for(String str:this.names){
+			sb.append(str+"\t");
+		}
+		return sb.toString();
+	}
 	public String getName() {
 		return this.name;
 	}
@@ -55,6 +63,10 @@ public class Org {
 			names[i]=row[i].getContents();
 		}
 				
+	}
+	public void setNames(List<String> names){
+		
+//		this.names=
 	}
 	public String[] getNames() {
 		return this.names;

@@ -61,7 +61,8 @@ public class PersonFeature {
 
 	public static void main(String[] args) throws IOException, Exception {
 		PersonFeature pf = new PersonFeature();
-		pf.eva("INFOCOM", "2012");
+		pf.eva("AAAI", "2005");
+		pf.eva("AAAI", "2007");
 //		List<String> confs = new ArrayList<String>();
 //		TxtService.getStringList(".\\res\\CCFA.txt", confs);
 //		String[][] a = new String[10][confs.size()];
@@ -118,7 +119,6 @@ public class PersonFeature {
 		OrgrankPersonevaService personService = new OrgrankPersonevaService();
 		OrgrankPaperCopyService paperService = new OrgrankPaperCopyService();
 		LuceneService luceneService = new LuceneService();
-		// luceneService.buildIndexFromExcel(".\\res\\List720 - ¸±±¾.xls");
 		Map<String, List<String>> personPubMap = personService.queryCY(conf,
 				year);
 		int findAll = 0;
@@ -133,11 +133,11 @@ public class PersonFeature {
 					TxtService ts = new TxtService();
 					Set<String> set = ts.regulize(personPubMap.get(person));
 					set.removeAll(ts.regulize(find));
-					// System.out.println(person + " " + find.size() + "/"
-					// + personPubMap.get(person).size());
+					 System.out.println(person + " " + find.size() + "/"
+					 + personPubMap.get(person).size());
 					for (String title : set) {
 						if (paperService.queryPubByTitle(title).size() > 0) {
-							// System.out.println(title + " EXISTS");
+							 System.out.println(title + " EXISTS");
 							findAll++;
 						} else {
 							System.out.println(person + ":" + conf + year
@@ -149,11 +149,11 @@ public class PersonFeature {
 					TxtService ts = new TxtService();
 					Set<String> set = ts.regulize(personPubMap.get(person));
 					set.removeAll(ts.regulize(find));
-					// System.out.println(person + " " + find.size() + "/"
-					// + personPubMap.get(person).size());
+					 System.out.println(person + " " + find.size() + "/"
+					 + personPubMap.get(person).size());
 					for (String title : set) {
 						if (paperService.queryPubByTitle(title).size() > 0) {
-							// System.out.println(title + " EXISTS");
+							 System.out.println(title + " EXISTS");
 							findAll++;
 						} else {
 							System.out.println(person + ":" + conf + year
