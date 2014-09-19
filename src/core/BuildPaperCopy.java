@@ -45,7 +45,7 @@ public class BuildPaperCopy {
 		// bc.printTxtLackOrg();
 		// bc.updateNcite();
 //		bc.doSomeInc();
-		bc.getPubsByOrg("Microsoft");
+//		bc.getPubsByOrg("Microsoft");
 	}
 
 	public void doSomeInc() {
