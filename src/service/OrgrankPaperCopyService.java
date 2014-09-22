@@ -144,7 +144,7 @@ public class OrgrankPaperCopyService extends SqlService {
 		List<String> b = queryAColByYC("endPage", year, conf);
 		List<Integer> res = findPage(a, b);
 		if (res.size() == 2) {
-			System.out.print("����:");
+			System.out.print("res.size=2:");
 		}
 		for (int i = 0; i < res.size(); i++) {
 			if (i % 2 == 0)

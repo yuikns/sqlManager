@@ -49,6 +49,7 @@ public class OrgrankOrgService extends SqlService {
 		return query(dbName, tableName, where, col);
 	}
 	public List<String> queryMetaById(String Id) {
+		
 		String[] col = { "idorg", "org",
 				 "orgClusterText" };
 		String where = String.format("where `idorg` =%s ", Id);

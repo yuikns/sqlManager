@@ -2,6 +2,7 @@ package core;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -37,11 +38,12 @@ public class OrgMetaData {
 		// omd.updateScore();
 		// omd.updateMeta();
 		// omd.insertOneMeta(row);
-//		omd.updateScore(omd.getOrgRankList(3), "orgtype3");
-		omd.queryPublicationById(297, 0, 1000);
+		omd.updateScore(omd.getOrgRankList(0), "org");
+		// omd.queryPublicationById(297, 0, 1000);
 	}
+
 	public List<String> getOrgRankList(int n) {
-		List<String> res=null;
+		List<String> res = null;
 		BuildAllMessIndex bami = new BuildAllMessIndex();
 		try {
 			switch (n) {
@@ -71,6 +73,9 @@ public class OrgMetaData {
 				break;
 			case 9:
 				res = bami.countOrg(type9);
+				break;
+			case 10:
+				res = bami.countOrg(type10);
 				break;
 			default:
 				res = bami.countOrg();
@@ -110,6 +115,8 @@ public class OrgMetaData {
 
 	public String queryMetaById(int id) {
 		OrgrankOrgService os = new OrgrankOrgService();
+//		String[] col = { "idorg", "org",
+//		 "orgClusterText" };
 		List<String> res = os.queryMetaById(String.valueOf(id));
 		if (res.size() > 0) {
 			return res.get(0);
@@ -118,15 +125,17 @@ public class OrgMetaData {
 			return null;
 		}
 	}
-	public List<Publication> queryPublicationById(int id, int cover, int limit) {
+
+	public List<Publication> queryPublicationByIdYear(int id, int limit,
+			int... year) {
 		List<Publication> res = null;
-		// String[] col = { "idorg", "org", "orgClusterText" };
 		String str = queryMetaById(id);
 		if (str != null) {
-			String[] strs = str.split("\t");
-			String orgs = strs[2];
+			str.replaceFirst("\t", ";");
+			int start=str.indexOf("\t")+1;
+			String orgs = str.substring(start);
 			BuildPaperCopy bc = new BuildPaperCopy();
-			res=bc.getPubsByOrg(orgs);
+			res = bc.getPubsByOrg(orgs, year);
 		}
 		System.out.println(res.size());
 		if (limit > 0 && limit < res.size())
@@ -134,56 +143,73 @@ public class OrgMetaData {
 		else
 			return res;
 	}
-//	public List<Publication> queryPublicationById(int id, int cover, int limit) {
-//		List<Publication> res = null;
-//		// String[] col = { "idorg", "org", "orgClusterText" };
-//		String str = queryMetaById(id);
-//		if (str != null) {
-//			String[] strs = str.split("\t");
-//			String orgs = strs[2];
-//			BuildAllMessIndex bami = new BuildAllMessIndex();
-//			bami.getPubsByOrg(0, orgs);
-//			switch (cover) {
-//			case 1:
-//				res = bami.getPubsByOrg(0, orgs, type1);
-//				break;
-//			case 2:
-//				res = bami.getPubsByOrg(0, orgs, type2);
-//				break;
-//			case 3:
-//				res = bami.getPubsByOrg(0, orgs, type3);
-//				break;
-//			case 4:
-//				res = bami.getPubsByOrg(0, orgs, type4);
-//				break;
-//			case 5:
-//				res = bami.getPubsByOrg(0, orgs, type5);
-//				break;
-//			case 6:
-//				res = bami.getPubsByOrg(0, orgs, type6);
-//				break;
-//			case 7:
-//				res = bami.getPubsByOrg(0, orgs, type7);
-//				break;
-//			case 8:
-//				res = bami.getPubsByOrg(0, orgs, type8);
-//				break;
-//			case 9:
-//				res = bami.getPubsByOrg(0, orgs, type9);
-//				break;
-//			case 10:
-//				res = bami.getPubsByOrg(0, orgs, type10);
-//				break;
-//			default:
-//				res = bami.getPubsByOrg(0, orgs);
-//			}
-//		}
-//		System.out.println(res.size());
-//		if (limit > 0 && limit < res.size())
-//			return res.subList(0, limit);
-//		else
-//			return res;
-//	}
+	public List<Publication> queryPublicationByIdConf(int id, int limit,
+			String... conf) {
+		List<Publication> res = null;
+		String str = queryMetaById(id);
+		if (str != null) {
+			str.replaceFirst("\t", ";");
+			int start=str.indexOf("\t")+1;
+			String orgs = str.substring(start);
+			BuildPaperCopy bc = new BuildPaperCopy();
+			res = bc.getPubsByOrgConf(orgs, conf);
+		}
+		if (limit > 0 && limit < res.size())
+			return res.subList(0, limit);
+		else
+			return res;
+	}
+	// public List<Publication> queryPublicationById(int id, int cover, int
+	// limit) {
+	// List<Publication> res = null;
+	// // String[] col = { "idorg", "org", "orgClusterText" };
+	// String str = queryMetaById(id);
+	// if (str != null) {
+	// String[] strs = str.split("\t");
+	// String orgs = strs[2];
+	// BuildAllMessIndex bami = new BuildAllMessIndex();
+	// bami.getPubsByOrg(0, orgs);
+	// switch (cover) {
+	// case 1:
+	// res = bami.getPubsByOrg(0, orgs, type1);
+	// break;
+	// case 2:
+	// res = bami.getPubsByOrg(0, orgs, type2);
+	// break;
+	// case 3:
+	// res = bami.getPubsByOrg(0, orgs, type3);
+	// break;
+	// case 4:
+	// res = bami.getPubsByOrg(0, orgs, type4);
+	// break;
+	// case 5:
+	// res = bami.getPubsByOrg(0, orgs, type5);
+	// break;
+	// case 6:
+	// res = bami.getPubsByOrg(0, orgs, type6);
+	// break;
+	// case 7:
+	// res = bami.getPubsByOrg(0, orgs, type7);
+	// break;
+	// case 8:
+	// res = bami.getPubsByOrg(0, orgs, type8);
+	// break;
+	// case 9:
+	// res = bami.getPubsByOrg(0, orgs, type9);
+	// break;
+	// case 10:
+	// res = bami.getPubsByOrg(0, orgs, type10);
+	// break;
+	// default:
+	// res = bami.getPubsByOrg(0, orgs);
+	// }
+	// }
+	// System.out.println(res.size());
+	// if (limit > 0 && limit < res.size())
+	// return res.subList(0, limit);
+	// else
+	// return res;
+	// }
 
 	public List<String> queryOrg(int cover) {
 		List<String> util;
