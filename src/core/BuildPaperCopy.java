@@ -39,13 +39,13 @@ public class BuildPaperCopy {
 		// bc.updateUnicode("technlology", "technology");
 		// bc.buildTable(3);
 		// bc.deleteData();
-
+		bc.evaCompletity();
 		// bc.queryPage();
 		// bc.updateOrg();
 		// bc.updatePage();
 		// bc.evaOrgCompletity();
 		// bc.printTxtLackOrg();
-		// bc.updateNcite();
+//		 bc.updateNcite();
 		// bc.doSomeInc();
 	}
 

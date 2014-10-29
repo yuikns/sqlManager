@@ -70,7 +70,7 @@ public class OrgrankPaperCopyService extends SqlService {
 	}
 
 	public List<String> checkGroupByCY() {
-		String sql = "SELECT jconf,`year`,count(idpaper) FROM `orgranktest`.`paper_copy` group by jconf,`year`";
+		String sql = "SELECT jconf,`year`,count(idpaper) FROM `orgranktest`.`paper_copy` where orgs=\"\" or orgs like \"%-;%\"  or orgs =\"-\" group by jconf,`year`";
 		return queryDIY(dbName, sql, 3);
 	}
 
