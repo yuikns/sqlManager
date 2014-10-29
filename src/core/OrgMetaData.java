@@ -15,6 +15,8 @@ import model.Org;
 import model.Publication;
 
 import service.ExcelService;
+import service.JsonService;
+import service.MongoService;
 import service.OrgrankOrgService;
 import service.TxtService;
 
@@ -22,8 +24,7 @@ public class OrgMetaData {
 	String[] type1 = { "ASPLOS", "FAST", "HPCA", "ISCA", "MICRO" };
 	String[] type2 = { "MOBICOM", "SIGCOMM", "INFOCOM" };
 	String[] type3 = { "CCS", "CRYPTO", "EUROCRYPT", "S&P", "USENIX Security" };
-	String[] type4 = { "FSE_ESEC", "OOPSLA", "ICSE", "OSDI", "PLDI", "POPL",
-			"SOSP" };
+	String[] type4 = { "FSE_ESEC", "OOPSLA", "ICSE", "OSDI", "PLDI", "POPL", "SOSP" };
 	String[] type5 = { "SIGMOD", "SIGKDD", "SIGIR", "VLDB", "ICDE" };
 	String[] type6 = { "STOC", "FOCS", "LICS" };
 	String[] type7 = { "ACM MM", "SIGGRAPH", "VIS" };
@@ -34,12 +35,38 @@ public class OrgMetaData {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		OrgMetaData omd = new OrgMetaData();
-		// omd.buildTable();
+//		 omd.buildTable();
 		// omd.updateScore();
 		// omd.updateMeta();
 		// omd.insertOneMeta(row);
-		omd.updateScore(omd.getOrgRankList(0), "org");
+		 omd.updateScore(omd.getOrgRankList(0), "org");
 		// omd.queryPublicationById(297, 0, 1000);
+//		omd.exportData();
+	}
+
+	public void exportData() {
+		OrgrankOrgService oos = new OrgrankOrgService();
+		List<String> gsons=new ArrayList<String>();
+		List<String> res = oos.queryMeta();
+		List<String> res0 = oos.queryAllScore("org");
+		List<List<String>> resi = new ArrayList<List<String>>();
+		String tableName = "orgtype";
+		int tableNum = 9;
+		for (int j = 1; j < tableNum + 1; j++) {
+			resi.add(oos.queryAllScore(tableName + String.valueOf(j)));
+		}
+		for (int i = 0; i < res.size(); i++) {
+			StringBuilder sb = new StringBuilder();
+			sb.append(res0.get(i) + "\t");
+			for (int j = 0; j < tableNum; j++)
+				sb.append(resi.get(j).get(i) + "\t");
+			String line = sb.toString();
+			JsonService js = new JsonService();
+			String output = js.toOrgJson(res.get(i), line);
+			gsons.add(output);
+		}
+		MongoService ms=new MongoService();
+		ms.insertOrgJsonIntoMongo(gsons);
 	}
 
 	public List<String> getOrgRankList(int n) {
@@ -94,7 +121,7 @@ public class OrgMetaData {
 		int i = os.getMaxid();
 		row = row.trim();
 		if (!"".equals(row)) {
-			Org obj = new Org(++i, row);
+			Org obj = new Org(row);
 			int res = os.insertMetaIntoOrg(obj);
 			System.out.println(row);
 			System.out.println(res);
@@ -115,8 +142,8 @@ public class OrgMetaData {
 
 	public String queryMetaById(int id) {
 		OrgrankOrgService os = new OrgrankOrgService();
-//		String[] col = { "idorg", "org",
-//		 "orgClusterText" };
+		// String[] col = { "idorg", "org",
+		// "orgClusterText" };
 		List<String> res = os.queryMetaById(String.valueOf(id));
 		if (res.size() > 0) {
 			return res.get(0);
@@ -126,13 +153,12 @@ public class OrgMetaData {
 		}
 	}
 
-	public List<Publication> queryPublicationByIdYear(int id, int limit,
-			int... year) {
+	public List<Publication> queryPublicationByIdYear(int id, int limit, int... year) {
 		List<Publication> res = null;
 		String str = queryMetaById(id);
 		if (str != null) {
 			str.replaceFirst("\t", ";");
-			int start=str.indexOf("\t")+1;
+			int start = str.indexOf("\t") + 1;
 			String orgs = str.substring(start);
 			BuildPaperCopy bc = new BuildPaperCopy();
 			res = bc.getPubsByOrg(orgs, year);
@@ -143,13 +169,13 @@ public class OrgMetaData {
 		else
 			return res;
 	}
-	public List<Publication> queryPublicationByIdConf(int id, int limit,
-			String... conf) {
+
+	public List<Publication> queryPublicationByIdConf(int id, int limit, String... conf) {
 		List<Publication> res = null;
 		String str = queryMetaById(id);
 		if (str != null) {
 			str.replaceFirst("\t", ";");
-			int start=str.indexOf("\t")+1;
+			int start = str.indexOf("\t") + 1;
 			String orgs = str.substring(start);
 			BuildPaperCopy bc = new BuildPaperCopy();
 			res = bc.getPubsByOrgConf(orgs, conf);
@@ -159,6 +185,7 @@ public class OrgMetaData {
 		else
 			return res;
 	}
+
 	// public List<Publication> queryPublicationById(int id, int cover, int
 	// limit) {
 	// List<Publication> res = null;
@@ -263,7 +290,7 @@ public class OrgMetaData {
 			for (String row : util) {
 				row = row.trim();
 				if (!"".equals(row)) {
-					Org obj = new Org(++i, row);
+					Org obj = new Org(row);
 					int res = os.insertMetaIntoOrg(obj);
 					System.out.println(row);
 					System.out.println(res);
@@ -285,7 +312,7 @@ public class OrgMetaData {
 			for (String row : util) {
 				row = row.trim();
 				if (!"".equals(row)) {
-					Org obj = new Org(++i, row);
+					Org obj = new Org(row);
 					int res = os.updateMetaIntoOrg(obj);
 					System.out.println(row);
 					System.out.println(res);
@@ -305,18 +332,14 @@ public class OrgMetaData {
 				System.out.println(row);
 				String[] scores = row.split("\t");
 				if (scores.length > 2) {
-					int res = os.updateScore(scores[0], "scoreCount",
-							scores[1], tableName);
+					int res = os.updateScore(scores[0], "scoreCount", scores[1], tableName);
 					System.out.println(res);
-					res = os.updateScore(scores[0], "scoreCountReg", scores[2],
-							tableName);
+					res = os.updateScore(scores[0], "scoreCountReg", scores[2], tableName);
 				}
 				if (scores.length > 4) {
-					int res = os.updateScore(scores[0], "scoreCite", scores[3],
-							tableName);
+					int res = os.updateScore(scores[0], "scoreCite", scores[3], tableName);
 					System.out.println(res);
-					res = os.updateScore(scores[0], "scoreCiteReg", scores[4],
-							tableName);
+					res = os.updateScore(scores[0], "scoreCiteReg", scores[4], tableName);
 					System.out.println(res);
 				}
 			}
@@ -335,11 +358,9 @@ public class OrgMetaData {
 					System.out.println(row);
 					String[] scores = row.split("\t");
 					if (scores.length > 2) {
-						int res = os.updateScore(scores[0], "scoreCount",
-								scores[1], tableName);
+						int res = os.updateScore(scores[0], "scoreCount", scores[1], tableName);
 						System.out.println(res);
-						res = os.updateScore(scores[0], "scoreCountReg",
-								scores[2], tableName);
+						res = os.updateScore(scores[0], "scoreCountReg", scores[2], tableName);
 						System.out.println(res);
 					}
 				}

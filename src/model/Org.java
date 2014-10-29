@@ -6,6 +6,7 @@ import jxl.*;
 
 public class Org {
 	String id;
+	String type;
 	String name;
 	String[] names;
 	Double scoreCount;
@@ -22,10 +23,15 @@ public class Org {
 		setNames(row);
 		setName();
 	}
-	public Org(int id,String row) {
-		setId(id);
-		setNames(row);
-		setName();
+	public Org(String row) {
+		String[] strs=row.split("\t");
+		setId(strs[0]);
+		setName(strs[1]);
+		setType(strs[2]);
+		setNames(strs[3]);
+	}
+	public void setType(String type){
+		this.type=type;
 	}
 	public String getId() {
 		return this.id;
@@ -39,6 +45,9 @@ public class Org {
 	}
 	public String getName() {
 		return this.name;
+	}
+	public String getType() {
+		return this.type;
 	}
 	public void setId(String id){
 		this.id=id;

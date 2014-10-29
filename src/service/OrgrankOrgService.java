@@ -22,9 +22,16 @@ public class OrgrankOrgService extends SqlService {
 	}
 
 	public List<String> queryAll(String tableName) {
-		String[] col = {"idOrg", "org", "scoreCount", "scoreCountReg", "scoreCite",
+		String[] col = {"idOrg", "org","scoreCount", "scoreCountReg", "scoreCite",
 				"scoreCiteReg" };
 		String where = String.format("order by `scoreCountReg` desc");
+		return query(dbName, tableName, where, col);
+	}
+	public List<String> queryAllScore(String tableName) {
+		String[] col = { "scoreCount", "scoreCountReg", "scoreCite",
+				"scoreCiteReg" };
+		String where = String.format("order by `idorg`");
+//		String where = String.format("order by `scoreCountReg` desc");
 		return query(dbName, tableName, where, col);
 	}
 
@@ -57,13 +64,14 @@ public class OrgrankOrgService extends SqlService {
 	}
 	public int insertMetaIntoOrg(Org obj) {
 		List<String> values = new ArrayList<String>();
-		String[] cols = new String[3];
-		for (int i = 0; i < 3; i++) {
+		String[] cols = new String[4];
+		for (int i = 0; i < 4; i++) {
 			cols[i] = tableMetaData.get(i).get(1);
 		}
 		values.add(String.valueOf(obj.getId()));
 		values.add(obj.getName());
 		values.add(obj.getClusterText());
+		values.add(obj.getType());
 		int result = insert(dbName, tableName, values, cols);
 		return result;
 	}

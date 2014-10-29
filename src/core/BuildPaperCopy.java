@@ -30,7 +30,7 @@ public class BuildPaperCopy {
 		// TODO Auto-generated method stub
 		BuildPaperCopy bc = new BuildPaperCopy();
 		// bc.compareTitle("2004","VIS",".\\res\\pubEva\\vis20042008.xls");
-		 bc.evaTitle();
+//		 bc.evaTitle();
 		// String dirPath = ".\\res\\pubEva\\txt1";
 		// File dir = new File(dirPath);
 		// for (String filePath : dir.list()) {
@@ -39,13 +39,13 @@ public class BuildPaperCopy {
 		// bc.updateUnicode("technlology", "technology");
 		// bc.buildTable(3);
 		// bc.deleteData();
-
+		bc.evaCompletity();
 		// bc.queryPage();
 		// bc.updateOrg();
 		// bc.updatePage();
 		// bc.evaOrgCompletity();
 		// bc.printTxtLackOrg();
-		// bc.updateNcite();
+//		 bc.updateNcite();
 		// bc.doSomeInc();
 	}
 

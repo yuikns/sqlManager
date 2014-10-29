@@ -85,10 +85,20 @@ public class BuildAllMessIndex {
 		// "Public Key Encryption with Keyword Search",
 		// "CVPR", "2007");
 		// bami.doSomeTask(0);
-		// Double result = bami.orgQuery(1, "microsoft");
-		// System.out.println(result);
+		 Double[] result = bami.orgQuery(1, "University of Essex");
+		 for(int i=0;i<result.length;i++)
+		 System.out.println(result[i]);
+		 result = bami.orgQuery(2, "University of Essex");
+		 for(int i=0;i<result.length;i++)
+		 System.out.println(result[i]);		 
+		 result = bami.orgQuery(3, "University of Essex");
+		 for(int i=0;i<result.length;i++)
+		 System.out.println(result[i]);
+		 result = bami.orgQuery(4, "University of Essex");
+		 for(int i=0;i<result.length;i++)
+		 System.out.println(result[i]);
 		// bami.get100Univ();
-		 bami.countOrg();
+//		 bami.countOrg();
 		// bami.countOrg(Arg.citeLog);
 		// bami.countOrg(Arg.normCount);
 
@@ -123,9 +133,11 @@ public class BuildAllMessIndex {
 		List<String> metaList = oos.queryMeta();
 		for (String line : metaList) {
 			StringBuilder sb = new StringBuilder();
+			System.out.println();
 			String org = line.split("\t")[2];
 			String id = line.split("\t")[0];
 			sb.append(id + "\t");
+			System.out.println("org:"+org+" id:"+id);
 			// sb.append(org + "\t");
 			Double[] sum = { 0.0, 0.0, 0.0, 0.0 };
 			for (int i = 0; i < 4; i++) {
@@ -152,7 +164,7 @@ public class BuildAllMessIndex {
 			// 设置查询关键词
 			while (ts.incrementToken()) {
 				// //调试用注释
-				// System.out.println("<<<" + term.toString());
+//				 System.out.println("<<<" + term.toString());
 				phraseQuery.add(new Term(field, term.toString()));
 			}
 			query.add(new BooleanClause(phraseQuery, Occur.MUST));
@@ -322,25 +334,25 @@ public class BuildAllMessIndex {
 			// 创建搜索类
 			indexSearcher = new IndexSearcher(indexReader);
 			BooleanQuery query = new BooleanQuery();
-			String[] name = orgs.split("\t");
+			String[] name = orgs.split(";");
 			for (int i = 0; i < name.length; i++) {
 				BooleanQuery subQuery;
 				switch (seq) {
 				case 1:
 					subQuery = parseKeyword("firstAuthorOrg", name[i]);
-					query.add(new BooleanClause(subQuery, Occur.MUST));
+					query.add(new BooleanClause(subQuery, Occur.SHOULD));
 					break;
 				case 2:
 					subQuery = parseKeyword("secordAuthorOrg", name[i]);
-					query.add(new BooleanClause(subQuery, Occur.MUST));
+					query.add(new BooleanClause(subQuery, Occur.SHOULD));
 					break;
 				case 3:
 					subQuery = parseKeyword("thirdAuthorOrg", name[i]);
-					query.add(new BooleanClause(subQuery, Occur.MUST));
+					query.add(new BooleanClause(subQuery, Occur.SHOULD));
 					break;
 				case 4:
 					subQuery = parseKeyword("otherAuthorOrg", name[i]);
-					query.add(new BooleanClause(subQuery, Occur.MUST));
+					query.add(new BooleanClause(subQuery, Occur.SHOULD));
 					break;
 				default:
 					break;
@@ -357,7 +369,7 @@ public class BuildAllMessIndex {
 				}
 				query.add(new BooleanClause(subQuery, Occur.MUST));
 			}
-			// System.out.println(query.toString());
+			 System.out.println(query.toString());
 
 			TopDocs topDocs = indexSearcher.search(query, 5000, sort);
 			ScoreDoc[] scoreDoc = topDocs.scoreDocs;
@@ -366,6 +378,7 @@ public class BuildAllMessIndex {
 				int doc = scoreDoc[i].doc;
 				Document mydoc = indexSearcher.doc(doc);
 				String author = mydoc.get("author");
+				System.out.println(author);
 				int authorNum = author.split(";").length;
 				double nCitation = 1;
 				result[0]++;
