@@ -38,7 +38,10 @@ public class OrgMetaData {
 		// omd.updateScore();
 		// omd.updateMeta();
 		// omd.insertOneMeta(row);
-		omd.updateScore(omd.getOrgRankList(0), "org");
+		omd.updateScore(omd.getOrgRankList(6), "orgtype6");
+		omd.updateScore(omd.getOrgRankList(7), "orgtype7");
+		omd.updateScore(omd.getOrgRankList(8), "orgtype8");
+		omd.updateScore(omd.getOrgRankList(9), "orgtype9");
 		// omd.queryPublicationById(297, 0, 1000);
 	}
 

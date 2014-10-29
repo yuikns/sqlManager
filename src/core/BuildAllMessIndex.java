@@ -80,7 +80,7 @@ public class BuildAllMessIndex {
 	public static void main(String[] args) throws IOException, Exception {
 		BuildAllMessIndex bami = new BuildAllMessIndex();
 		// bami.readExcel(".\\res\\List720 - 副本.xls");
-//		bami.readSql();
+		bami.readSql();
 		// bami.pubQuery(
 		// "Public Key Encryption with Keyword Search",
 		// "CVPR", "2007");
@@ -88,7 +88,7 @@ public class BuildAllMessIndex {
 		// Double result = bami.orgQuery(1, "microsoft");
 		// System.out.println(result);
 		// bami.get100Univ();
-		 bami.countOrg();
+//		 bami.countOrg();
 		// bami.countOrg(Arg.citeLog);
 		// bami.countOrg(Arg.normCount);
 
