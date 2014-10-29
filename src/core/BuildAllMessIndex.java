@@ -62,13 +62,10 @@ public class BuildAllMessIndex {
 	protected static File indexFile = new File("./indexDirMess/");
 	protected static File indexFileSql = new File("./indexDirSql/");
 
-	public BuildAllMessIndex(){
-		System.out.println("#######################1");
+	public BuildAllMessIndex() {
 		analyzer = new SimpleAnalyzer(Version.LUCENE_43);
-		System.out.println("#######################1");
 	}
-	
-	
+
 	public enum Arg {
 		count, cite, citeLog, normCount
 	};
@@ -80,25 +77,26 @@ public class BuildAllMessIndex {
 	public static void main(String[] args) throws IOException, Exception {
 		BuildAllMessIndex bami = new BuildAllMessIndex();
 		// bami.readExcel(".\\res\\List720 - 副本.xls");
-		bami.readSql();
+		// bami.readSql();
+		// bami.openIndexFile();
 		// bami.pubQuery(
 		// "Public Key Encryption with Keyword Search",
 		// "CVPR", "2007");
 		// bami.doSomeTask(0);
-		 Double[] result = bami.orgQuery(1, "University of Essex");
-		 for(int i=0;i<result.length;i++)
-		 System.out.println(result[i]);
-		 result = bami.orgQuery(2, "University of Essex");
-		 for(int i=0;i<result.length;i++)
-		 System.out.println(result[i]);		 
-		 result = bami.orgQuery(3, "University of Essex");
-		 for(int i=0;i<result.length;i++)
-		 System.out.println(result[i]);
-		 result = bami.orgQuery(4, "University of Essex");
-		 for(int i=0;i<result.length;i++)
-		 System.out.println(result[i]);
+		// Double[] result = bami.orgQuery(1, "University of Essex");
+		// for(int i=0;i<result.length;i++)
+		// System.out.println(result[i]);
+		// result = bami.orgQuery(2, "University of Essex");
+		// for(int i=0;i<result.length;i++)
+		// System.out.println(result[i]);
+		// result = bami.orgQuery(3, "University of Essex");
+		// for(int i=0;i<result.length;i++)
+		// System.out.println(result[i]);
+		// result = bami.orgQuery(4, "University of Essex");
+		// for(int i=0;i<result.length;i++)
+		// System.out.println(result[i]);
 		// bami.get100Univ();
-//		 bami.countOrg();
+		bami.countOrg();
 		// bami.countOrg(Arg.citeLog);
 		// bami.countOrg(Arg.normCount);
 
@@ -137,14 +135,16 @@ public class BuildAllMessIndex {
 			String org = line.split("\t")[2];
 			String id = line.split("\t")[0];
 			sb.append(id + "\t");
-			System.out.println("org:"+org+" id:"+id);
 			// sb.append(org + "\t");
 			Double[] sum = { 0.0, 0.0, 0.0, 0.0 };
 			for (int i = 0; i < 4; i++) {
 				Double[] result = orgQuery(i + 1, org, type);
-				sum[i] += result[i];
+				sum[0] += result[0];
+				sum[1] += result[1];
+				sum[2] += result[2];
+				sum[3] += result[3];
 			}
-			sb.append(sum[0]+"\t"+sum[1]+"\t"+sum[2]+"\t"+sum[3]);
+			sb.append(sum[0] + "\t" + sum[1] + "\t" + sum[2] + "\t" + sum[3]);
 			res.add(sb.toString());
 			System.out.println(sb.toString());
 		}
@@ -164,7 +164,7 @@ public class BuildAllMessIndex {
 			// 设置查询关键词
 			while (ts.incrementToken()) {
 				// //调试用注释
-//				 System.out.println("<<<" + term.toString());
+				// System.out.println("<<<" + term.toString());
 				phraseQuery.add(new Term(field, term.toString()));
 			}
 			query.add(new BooleanClause(phraseQuery, Occur.MUST));
@@ -322,7 +322,7 @@ public class BuildAllMessIndex {
 		}
 		return result;
 	}
-	
+
 	Double[] orgQuery(int seq, String orgs, String[]... type) {
 		IndexReader indexReader = null;
 		IndexSearcher indexSearcher = null;
@@ -369,7 +369,7 @@ public class BuildAllMessIndex {
 				}
 				query.add(new BooleanClause(subQuery, Occur.MUST));
 			}
-			 System.out.println(query.toString());
+//			 System.out.println(query.toString());
 
 			TopDocs topDocs = indexSearcher.search(query, 5000, sort);
 			ScoreDoc[] scoreDoc = topDocs.scoreDocs;
@@ -378,21 +378,21 @@ public class BuildAllMessIndex {
 				int doc = scoreDoc[i].doc;
 				Document mydoc = indexSearcher.doc(doc);
 				String author = mydoc.get("author");
-				System.out.println(author);
+//				 System.out.println( mydoc.get("content"));
 				int authorNum = author.split(";").length;
 				double nCitation = 1;
 				result[0]++;
 				result[1] += calculateScore(seq, authorNum, nCitation);
 				String tempCite = mydoc.get("nCite");
-				try{
+				try {
 					nCitation = (Integer.parseInt(tempCite) > 1) ? Integer
 							.parseInt(tempCite) : 1;
 					result[2] += calculateScore(seq, authorNum, nCitation);
 					nCitation = (10 * Math.log10(nCitation));
 					nCitation = (nCitation > 1) ? nCitation : 1;
 					result[3] += calculateScore(seq, authorNum, nCitation);
-				}catch(Exception ae){
-					
+				} catch (Exception ae) {
+
 				}
 			}
 			// // 调试用注释
@@ -415,10 +415,11 @@ public class BuildAllMessIndex {
 		}
 		return result;
 	}
-	List<Publication> getPubsByOrg(int seq, String orgs,String[]... type) {
+
+	List<Publication> getPubsByOrg(int seq, String orgs, String[]... type) {
 		IndexReader indexReader = null;
 		IndexSearcher indexSearcher = null;
-		List<Publication> result=new Vector<Publication>();
+		List<Publication> result = new Vector<Publication>();
 		try {
 			indexReader = DirectoryReader.open(FSDirectory.open(indexFileSql));
 			Sort sort = new Sort(new SortField[] { new SortField("year",
@@ -447,10 +448,14 @@ public class BuildAllMessIndex {
 					query.add(new BooleanClause(subQuery, Occur.MUST));
 					break;
 				default:
-					query.add(new BooleanClause(parseKeyword("firstAuthorOrg", name[i]), Occur.SHOULD));
-					query.add(new BooleanClause(parseKeyword("secordAuthorOrg", name[i]), Occur.SHOULD));
-					query.add(new BooleanClause(parseKeyword("thirdAuthorOrg", name[i]), Occur.SHOULD));
-					query.add(new BooleanClause(parseKeyword("otherAuthorOrg", name[i]), Occur.SHOULD));
+					query.add(new BooleanClause(parseKeyword("firstAuthorOrg",
+							name[i]), Occur.SHOULD));
+					query.add(new BooleanClause(parseKeyword("secordAuthorOrg",
+							name[i]), Occur.SHOULD));
+					query.add(new BooleanClause(parseKeyword("thirdAuthorOrg",
+							name[i]), Occur.SHOULD));
+					query.add(new BooleanClause(parseKeyword("otherAuthorOrg",
+							name[i]), Occur.SHOULD));
 					break;
 				}
 			}
@@ -474,14 +479,14 @@ public class BuildAllMessIndex {
 				// 内部编号 ,和数据库表中的唯一标识列一样
 				int doc = scoreDoc[i].doc;
 				Document mydoc = indexSearcher.doc(doc);
-				String content=mydoc.get("content");
-				Publication pub=new Publication();
-				pub.id=content.split("\t")[0];
-				pub.title=content.split("\t")[1];
-				pub.authors=content.split("\t")[2];
-				pub.year=mydoc.get("year");
-				pub.jconf=mydoc.get("jonf");
-				pub.nCite=mydoc.get("nCite");
+				String content = mydoc.get("content");
+				Publication pub = new Publication();
+				pub.id = content.split("\t")[0];
+				pub.title = content.split("\t")[1];
+				pub.authors = content.split("\t")[2];
+				pub.year = mydoc.get("year");
+				pub.jconf = mydoc.get("jonf");
+				pub.nCite = mydoc.get("nCite");
 				result.add(pub);
 			}
 		} catch (CorruptIndexException e) {
@@ -763,15 +768,28 @@ public class BuildAllMessIndex {
 			int count = 0;
 			for (int i = 0; i < docLength; i++) {
 				Document doc = indexReader.document(i);
-				if (!visited.contains(doc.get("id"))) {
-					Publication pub = new Publication(doc.get("content"));
-					bw.write(pub.toString() + "\r\n");
-					count++;
+				// if (!visited.contains(doc.get("id"))) {
+				// Publication pub = new Publication(doc.get("content"));
+				// bw.write(pub.toString() + "\r\n");
+				// count++;
+				// }
+				if (doc.get("content").contains("university of essex")) {
+					System.out.println(doc.get("content"));
+					String s1 = doc.get("firstAuthorOrg");
+					String s2 = doc.get("secordAuthorOrg");
+					String s3 = doc.get("thirdAuthorOrg");
+					String s4 = doc.get("otherAuthorOrg");
+					System.out.println(s1);
+					System.out.println(s2);
+					System.out.println(s3);
+					System.out.println(s4);
+
 				}
+
 			}
-			bw.flush();
-			System.out.println("unvisited" + count + "/" + "visited"
-					+ visited.size() + "/" + docLength);
+			// bw.flush();
+			// System.out.println("unvisited" + count + "/" + "visited"
+			// + visited.size() + "/" + docLength);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
