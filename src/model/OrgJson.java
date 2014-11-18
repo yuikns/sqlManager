@@ -6,7 +6,7 @@ public class OrgJson {
 	String idorg;
 	String org;
 	String orgClusterText;
-	int isAcademic;
+	String type;
 	List<TypeScoreJson> typeScore;
 	
 	public void setIdorg(String idorg) {
@@ -15,11 +15,11 @@ public class OrgJson {
 	public String getIdorg() {
 		return this.idorg;
 	}
-	public void setIsAcademic(int isAcademic) {
-		this.isAcademic = isAcademic;
+	public void setIsAcademic(String type) {
+		this.type = type;
 	}
-	public int getIsAcademic() {
-		return this.isAcademic;
+	public String getIsAcademic() {
+		return this.type;
 	}
 	public void setOrg(String org) {
 		this.org = org;

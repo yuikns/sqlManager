@@ -3,6 +3,8 @@ package core;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -11,7 +13,10 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.util.Version;
 
+import com.google.gson.Gson;
+
 import model.Org;
+import model.OrgJson;
 import model.Publication;
 
 import service.ExcelService;
@@ -24,7 +29,8 @@ public class OrgMetaData {
 	String[] type1 = { "ASPLOS", "FAST", "HPCA", "ISCA", "MICRO" };
 	String[] type2 = { "MOBICOM", "SIGCOMM", "INFOCOM" };
 	String[] type3 = { "CCS", "CRYPTO", "EUROCRYPT", "S&P", "USENIX Security" };
-	String[] type4 = { "FSE_ESEC", "OOPSLA", "ICSE", "OSDI", "PLDI", "POPL", "SOSP" };
+	String[] type4 = { "FSE_ESEC", "OOPSLA", "ICSE", "OSDI", "PLDI", "POPL",
+			"SOSP" };
 	String[] type5 = { "SIGMOD", "SIGKDD", "SIGIR", "VLDB", "ICDE" };
 	String[] type6 = { "STOC", "FOCS", "LICS" };
 	String[] type7 = { "ACM MM", "SIGGRAPH", "VIS" };
@@ -35,30 +41,83 @@ public class OrgMetaData {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		OrgMetaData omd = new OrgMetaData();
-//		 omd.buildTable();
+		// omd.buildTable();
 		// omd.updateScore();
 		// omd.updateMeta();
 		// omd.insertOneMeta(row);
-
-		 omd.updateScore(omd.getOrgRankList(0), "org");
+		// omd.getOrgRankList(1);
+//		omd.updateScore(omd.getOrgRankList(0), "org");
 		// omd.queryPublicationById(297, 0, 1000);
-//		omd.exportData();
+		 omd.exportData();
+		// omd.exportMeta();
+//		 omd.exportMeta1();
 	}
 
-	public void exportData() {
+	public void exportMeta1() {
+		List<String> ranks = new ArrayList<String>();
+		try {
+			TxtService.getStringList("./res/univ_rank.txt", ranks);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		HashMap<String, String> my_rank_map = new HashMap<String, String>();
 		OrgrankOrgService oos = new OrgrankOrgService();
-		List<String> gsons=new ArrayList<String>();
 		List<String> res = oos.queryMeta();
-		List<String> res0 = oos.queryAllScore("org");
+		List<String> res1 = oos.queryScore("0", "scoreCount");
+		List<String> res2 = oos.queryScore("0", "scoreCountReg");
+		List<String> res3 = oos.queryScore("0", "scoreCite");
+		List<String> res4 = oos.queryScore("0", "scoreCiteReg");
+		List<String> res5 = oos.queryScore("0", "firstAuthorNum");
+		for (String str : res) {
+			String[] strs = str.split("\t");
+			String id = strs[0];
+			String name = strs[1];
+			String type = strs[3];
+			if (type.equals("0")) {
+				StringBuilder var = new StringBuilder();
+				String val1 = String.valueOf(res1.indexOf(id) + 1);
+				String val2 = String.valueOf(res2.indexOf(id) + 1);
+				String val3 = String.valueOf(res3.indexOf(id) + 1);
+				String val4 = String.valueOf(res4.indexOf(id) + 1);
+				String val5 = String.valueOf(res5.indexOf(id) + 1);
+				var.append(val1 + "\t" +val5+"\t"+ val2 + "\t" + val3 + "\t" + val4);
+				if (!my_rank_map.containsKey(name)) {
+					my_rank_map.put(name, var.toString());
+				}
+			}
+		}
+		int i = 0;
+		for (String str : ranks) {
+			i++;
+			String[] strs = str.split("\t");
+			String name = strs[1].trim();
+			if (my_rank_map.containsKey(name)) {
+				System.out.println(i + "\t" + name + "\t"
+						+ my_rank_map.get(name));
+			} else {
+
+				System.out.println(i + "\t" + name + "\tNot find!");
+			}
+		}
+	}
+
+	public void exportMeta() {
+		List<String> ranks = new ArrayList<String>();
+		try {
+			TxtService.getStringList("./res/univ_rank.txt", ranks);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		OrgrankOrgService oos = new OrgrankOrgService();
+		List<String> gsons = new ArrayList<String>();
+		List<String> res = oos.queryMeta("0");
 		List<List<String>> resi = new ArrayList<List<String>>();
-		String tableName = "orgtype";
-		int tableNum = 9;
-		for (int j = 1; j < tableNum + 1; j++) {
-			resi.add(oos.queryAllScore(tableName + String.valueOf(j)));
+		int tableNum = 1;
+		for (int j = 0; j < tableNum; j++) {
+			resi.add(getOrgRankList(j));
 		}
 		for (int i = 0; i < res.size(); i++) {
 			StringBuilder sb = new StringBuilder();
-			sb.append(res0.get(i) + "\t");
 			for (int j = 0; j < tableNum; j++)
 				sb.append(resi.get(j).get(i) + "\t");
 			String line = sb.toString();
@@ -66,7 +125,73 @@ public class OrgMetaData {
 			String output = js.toOrgJson(res.get(i), line);
 			gsons.add(output);
 		}
-		MongoService ms=new MongoService();
+		Collections.sort(gsons, new Comparator<String>() {
+
+			@Override
+			public int compare(String o1, String o2) {
+				Gson gson = new Gson();
+				String value1 = gson.fromJson(o1, OrgJson.class)
+						.getTypeScoreJsonScore().get(0).getCiteLog();
+				String value2 = gson.fromJson(o2, OrgJson.class)
+						.getTypeScoreJsonScore().get(0).getCiteLog();
+
+				Double d1 = Double.parseDouble(value1);
+				Double d2 = Double.parseDouble(value2);
+				return -1 * d1.compareTo(d2);
+			}
+		});
+
+		HashMap<String, String> my_rank_map = new HashMap<String, String>();
+		for (int i = 0; i < gsons.size(); i++) {
+			String gson = gsons.get(i);
+			Gson g = new Gson();
+			String id = g.fromJson(gson, OrgJson.class).getIdorg();
+			String name = g.fromJson(gson, OrgJson.class).getOrg();
+			String val = id + "\t" + String.valueOf(i + 1);
+			if (!my_rank_map.containsKey(name)) {
+				my_rank_map.put(name, val);
+			}
+		}
+		int i = 0;
+		for (String str : ranks) {
+			i++;
+			String[] strs = str.split("\t");
+			String name = strs[1].trim();
+			if (my_rank_map.containsKey(name)) {
+				System.out.println(i + "\t" + name + "\t"
+						+ my_rank_map.get(name));
+			} else {
+
+				System.out.println(i + "\t" + name + "\tNot find!");
+			}
+		}
+	}
+
+	public void exportData() {
+		OrgrankOrgService oos = new OrgrankOrgService();
+		List<String> gsons = new ArrayList<String>();
+		List<String> res = oos.queryMeta();
+		List<List<String>> resi = new ArrayList<List<String>>();
+		int tableNum =11;
+		for (int j = 0; j < tableNum; j++) {
+			resi.add(getOrgRankList(j));
+		}
+		for (int i = 0; i < res.size(); i++) {
+			StringBuilder sb = new StringBuilder();
+			for (int j = 0; j < tableNum; j++)
+				sb.append(resi.get(j).get(i) + "\t");
+			String line = sb.toString();
+			
+			JsonService js = new JsonService();
+			String output = js.toOrgJson(res.get(i), line);
+			if (i % 20 == 0) {
+				System.out.println("res:" + res.get(i));
+				System.out.println("line:"+line);
+				System.out.println(i + ":" + output);
+			}
+			gsons.add(output);
+		}
+		MongoService ms = new MongoService();
 		ms.insertOrgJsonIntoMongo(gsons);
 	}
 
@@ -154,7 +279,8 @@ public class OrgMetaData {
 		}
 	}
 
-	public List<Publication> queryPublicationByIdYear(int id, int limit, int... year) {
+	public List<Publication> queryPublicationByIdYear(int id, int limit,
+			int... year) {
 		List<Publication> res = null;
 		String str = queryMetaById(id);
 		if (str != null) {
@@ -171,7 +297,8 @@ public class OrgMetaData {
 			return res;
 	}
 
-	public List<Publication> queryPublicationByIdConf(int id, int limit, String... conf) {
+	public List<Publication> queryPublicationByIdConf(int id, int limit,
+			String... conf) {
 		List<Publication> res = null;
 		String str = queryMetaById(id);
 		if (str != null) {
@@ -331,18 +458,12 @@ public class OrgMetaData {
 			row = row.trim();
 			if (!"".equals(row)) {
 				System.out.println(row);
-				String[] scores = row.split("\t");
-				if (scores.length > 2) {
-					int res = os.updateScore(scores[0], "scoreCount", scores[1], tableName);
-					System.out.println(res);
-					res = os.updateScore(scores[0], "scoreCountReg", scores[2], tableName);
-				}
-				if (scores.length > 4) {
-					int res = os.updateScore(scores[0], "scoreCite", scores[3], tableName);
-					System.out.println(res);
-					res = os.updateScore(scores[0], "scoreCiteReg", scores[4], tableName);
-					System.out.println(res);
-				}
+				String[] strs = row.split("\t");
+				List<String> scores = new ArrayList<String>();
+				for (int i = 1; i < strs.length; i++)
+					scores.add(strs[i]);
+				int res = os.updateScore(strs[0], scores);
+				System.out.println(res);
 			}
 		}
 	}
@@ -359,9 +480,11 @@ public class OrgMetaData {
 					System.out.println(row);
 					String[] scores = row.split("\t");
 					if (scores.length > 2) {
-						int res = os.updateScore(scores[0], "scoreCount", scores[1], tableName);
+						int res = os.updateScore(scores[0], "scoreCount",
+								scores[1], tableName);
 						System.out.println(res);
-						res = os.updateScore(scores[0], "scoreCountReg", scores[2], tableName);
+						res = os.updateScore(scores[0], "scoreCountReg",
+								scores[2], tableName);
 						System.out.println(res);
 					}
 				}

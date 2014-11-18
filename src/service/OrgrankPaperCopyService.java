@@ -20,12 +20,23 @@ public class OrgrankPaperCopyService extends SqlService {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		OrgrankPaperCopyService os = new OrgrankPaperCopyService();
-		List<String> a = os.queryAColByYC("title", "2005", "ESEC_FSE");
-		for (String aa : a) {
-			System.out.println(aa);
+		os.writeBack();
+//		os.dosomework();
+	}
+	public void dosomework(){
+		String sql = "select idpaper,title,authors,orgs,jconf,`year`,startPage,endPage,nCite from`orgranktest`.`paper_copy`";
+		List<String> res = queryDIY(dbName, sql, 9);
+		for(String str:res){
+			String[] strs=str.split("\t");
+			if(strs.length>9){
+				String id=strs[0];
+				String sql1="select orgs from `orgranktest`.`paper_copy` where idpaper="+id;
+				String newOrg=queryDIY(dbName, sql1, 1).get(0);
+				newOrg=newOrg.replace("\t", "");
+				updateOrg(id, newOrg);
+			}
 		}
 	}
-
 	public OrgrankPaperCopyService() {
 		fillMetaData(dbName, tableName);
 	}
@@ -97,9 +108,9 @@ public class OrgrankPaperCopyService extends SqlService {
 			Publication pub = new Publication(a);
 			pubs.add(pub);
 		}
+		
 		return pubs;
 	}
-
 	public void comparePapers(List<String> a, List<String> b) {
 		Set<String> sa = new HashSet<String>(a);
 		Set<String> sb = new HashSet<String>(b);

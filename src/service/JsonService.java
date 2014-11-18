@@ -38,24 +38,17 @@ public class JsonService {
 		String[] strs = line.split("\t");
 		oj.setIdorg(metas[0]);
 		oj.setOrg(metas[1]);
-		String tmp = meta.substring(meta.indexOf("\t")+1);
-		tmp = tmp.substring(tmp.indexOf("\t")+1);
-		oj.setOrgClusterText(tmp);
-		if(tmp.toLowerCase().contains("univ")){
-			oj.setIsAcademic(1);
-		}
-		else{
-			oj.setIsAcademic(0);
-		}
-		int n = (strs.length) / 4;
-//		System.out.println("n:" + n);
+		oj.setOrgClusterText(metas[2]);
+		oj.setIsAcademic(metas[3]);
+		int n = (strs.length) / 5;
 		List<TypeScoreJson> tsjs = new ArrayList<TypeScoreJson>();
 		for (int i = 0; i < n; i++) {
 			TypeScoreJson tsj = new TypeScoreJson();
-			tsj.setCount(strs[i * 4]);
-			tsj.setCountReg(strs[i * 4 + 1]);
-			tsj.setCite(strs[i * 4 + 2]);
-			tsj.setCiteLog(strs[i * 4 + 3]);
+			tsj.setCount(strs[i * 5]);
+			tsj.setFirstAuthorNum(strs[i * 5 + 1]);
+			tsj.setCountReg(strs[i * 5 + 2]);
+			tsj.setCite(strs[i * 5 + 3]);
+			tsj.setCiteLog(strs[i * 5 + 4]);
 			tsjs.add(tsj);
 		}
 		oj.setTypeScore(tsjs);

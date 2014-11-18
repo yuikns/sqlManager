@@ -102,6 +102,9 @@ public class Publication implements Paper {
 	public Publication(String str) {
 		init();
 		String[] strs = str.split("\t");
+		if(strs.length>9){
+			System.out.println(str);
+		}
 		id = strs[0];
 		title = strs[1];
 		authors = strs[2];
@@ -360,7 +363,7 @@ public class Publication implements Paper {
 	}
 
 	public int getNcite() {
-		if (!this.nCite.equals(""))
+		if (this.nCite!=null&&!this.nCite.equals("null"))
 			return Integer.parseInt(this.nCite);
 		else
 			return 0;

@@ -5,7 +5,7 @@ public class TypeScoreJson {
 	String countReg;
 	String cite;
 	String citeLog;
-
+	String firstAuthorNum;
 	public String getCount() {
 		return this.count;
 	}
@@ -36,5 +36,11 @@ public class TypeScoreJson {
 	public void setCiteLog(String citeLog) {
 		this.citeLog = citeLog;
 	}
+	public String getFirstAuthorNum() {
+		return this.firstAuthorNum;
+	}
 
+	public void setFirstAuthorNum(String firstAuthorNum) {
+		this.firstAuthorNum=firstAuthorNum;
+	}
 }

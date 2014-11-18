@@ -165,7 +165,7 @@ public class SqlService {
 			String sql = sqlBuilderForQuery(dbName, tableName, where, cols);
 			conn = DriverManager.getConnection(url + dbName, user, password);
 			ps = conn.prepareStatement(sql);
-			System.out.println(ps.toString());
+//			System.out.println(ps.toString());
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				StringBuilder sb = new StringBuilder();
@@ -301,7 +301,7 @@ public class SqlService {
 			conn = DriverManager.getConnection(url + dbName, user, password);
 			ps = conn.prepareStatement(sql);
 			_constructPS(ps, values, colName2ColNo(cols));
-			System.out.println(ps.toString());
+//			System.out.println(ps.toString());
 			result = ps.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();

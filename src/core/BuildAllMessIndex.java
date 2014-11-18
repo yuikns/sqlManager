@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,6 +24,7 @@ import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.CorruptIndexException;
@@ -77,76 +79,82 @@ public class BuildAllMessIndex {
 	public static void main(String[] args) throws IOException, Exception {
 		BuildAllMessIndex bami = new BuildAllMessIndex();
 		// bami.readExcel(".\\res\\List720 - 副本.xls");
-		// bami.readSql();
+//		 bami.readSql();
 		// bami.openIndexFile();
 		// bami.pubQuery(
 		// "Public Key Encryption with Keyword Search",
 		// "CVPR", "2007");
-		// bami.doSomeTask(0);
-		// Double[] result = bami.orgQuery(1, "University of Essex");
-		// for(int i=0;i<result.length;i++)
-		// System.out.println(result[i]);
-		// result = bami.orgQuery(2, "University of Essex");
-		// for(int i=0;i<result.length;i++)
-		// System.out.println(result[i]);
-		// result = bami.orgQuery(3, "University of Essex");
-		// for(int i=0;i<result.length;i++)
-		// System.out.println(result[i]);
-		// result = bami.orgQuery(4, "University of Essex");
-		// for(int i=0;i<result.length;i++)
-		// System.out.println(result[i]);
-		// bami.get100Univ();
-		bami.countOrg();
-		// bami.countOrg(Arg.citeLog);
-		// bami.countOrg(Arg.normCount);
+		// bami.orgQuery(0,
+		// "Wake Forest University");
+		// bami.countOrg();
+		// bami.doSomeTask();
+		bami.orgQueryEva("0");
+//		 List<Publication>res=bami.getPubsByOrg(0,
+//		 "microsoft");
 
 	}
 
-	void doSomeTask(int arg) {
-		int startYear = 2004;
-		int endYear = 2014;
-		ArrayList<String> CCFA = new ArrayList<String>();
-		for (int i = startYear; i < endYear; i++) {
-			if (arg == 0) {
-				System.out.print("\t" + i + "\tkill\tdeadline");
-			} else {
-				System.out.print("\t" + i + "\tremain\tmaxkillpage");
-			}
-		}
-		System.out.println();
-		try {
-			TxtService.getStringList(".//res//CCFA.txt", CCFA);
-			for (String jconf : CCFA)
-				killShortPaper(jconf, startYear, endYear, arg);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
+	// List<String> countOrg(String[]... type) throws IOException {
+	// List<String> res = new Vector<String>();
+	// OrgrankOrgService oos = new OrgrankOrgService();
+	// List<String> metaList = oos.queryMeta();
+	// for (String line : metaList) {
+	// StringBuilder sb = new StringBuilder();
+	// String orgs = line.split("\t")[2];
+	// // String id = line.split("\t")[0];
+	// // sb.append(id + "\t");
+	// // sb.append(org + "\t");
+	// Double[] sum = { 0.0, 0.0, 0.0, 0.0,0.0 };
+	// System.out.println(orgs);
+	// Double[] result1 = orgQuery(0, orgs, type);
+	// sum[0] = result1[0];// paper num
+	// sum[3] = result1[2];// sum paper cite
+	// for (int i = 0; i < 4; i++) {
+	// Double[] result = orgQuery(i + 1, orgs, type);
+	// if(i==0){
+	// sum[4]=result[0];
+	// }
+	// sum[1] += result[1];// reg paper num
+	// sum[2] += result[2];// reg sum paper cite
+	//
+	// }
+	// sb.append(sum[0] + "\t"+sum[4]+"\t" + sum[1] + "\t" + sum[3] + "\t" +
+	// sum[2]);
+	// res.add(sb.toString());
+	// System.out.println(sb.toString());
+	// }
+	// return res;
+	// }
 	List<String> countOrg(String[]... type) throws IOException {
 		List<String> res = new Vector<String>();
 		OrgrankOrgService oos = new OrgrankOrgService();
 		List<String> metaList = oos.queryMeta();
 		for (String line : metaList) {
 			StringBuilder sb = new StringBuilder();
-			System.out.println();
-			String org = line.split("\t")[2];
+			String orgs = line.split("\t")[2];
 			String id = line.split("\t")[0];
-			sb.append(id + "\t");
+			// sb.append(id + "\t");
 			// sb.append(org + "\t");
-			Double[] sum = { 0.0, 0.0, 0.0, 0.0 };
+			Double[] sum = { 0.0, 0.0, 0.0, 0.0, 0.0 };
+			System.out.println(orgs);
+			Double[] result1 = orgQuery(0, orgs, type);
+			sum[0] = result1[0];// paper num
+			sum[3] = result1[2];// sum paper cite
 			for (int i = 0; i < 4; i++) {
-				Double[] result = orgQuery(i + 1, org, type);
-				sum[0] += result[0];
-				sum[1] += result[1];
-				sum[2] += result[2];
-				sum[3] += result[3];
+				Double[] result = orgQuery(i + 1, orgs, type);
+				if (i == 0) {
+					sum[4] = result[0];
+				}
+				sum[1] += result[1];// reg paper num
+				sum[2] += result[2];// reg sum paper cite
+
 			}
-			sb.append(sum[0] + "\t" + sum[1] + "\t" + sum[2] + "\t" + sum[3]);
+			sb.append(sum[0] + "\t" + sum[4] + "\t" + sum[1] + "\t" + sum[3]
+					+ "\t" + sum[2]);
 			res.add(sb.toString());
-			System.out.println(sb.toString());
+			System.out.println("paperNum:" + sum[0] + "\tfirstAuthorNum:"
+					+ sum[4] + "\tregPaperNum:" + sum[1] + "\tsumPaperCite:"
+					+ sum[3] + "\tregPaperCite" + sum[2]);
 		}
 		return res;
 	}
@@ -174,41 +182,23 @@ public class BuildAllMessIndex {
 
 	Double calculateScore(int seq, int authorNum, double nCite) {
 		Double score = calculateScore(seq, authorNum);
+		if (nCite < 1) {
+			nCite = 1;
+		}
 		score *= nCite;
+		// System.out.println("<<<<seq:"+seq+"  score:"+score+"  cite:"+nCite+"   authorNum:"+authorNum);
 		return score;
 	}
 
 	Double calculateScore(int seq, int authorNum) {
-		Double score = 0.0;
-		double incFirst = 1;
-		double incSecord = 0.5;
-		double incThird = 0.3;
-		double incOther = 0.2;
-		switch (authorNum) {
-		case 1:
-			incFirst = 2;
-			break;
-		case 2:
-			incFirst = 1.3;
-			incSecord = 0.7;
-			break;
-		case 3:
-			incSecord = 0.6;
-			incThird = 0.4;
-			break;
-		default:
-			break;
+		Double total = 0.0;
+		if (seq == 0) {
+			return 1.0;
 		}
-		switch (seq) {
-		case 1:
-			score = incFirst;
-		case 2:
-			score = incSecord;
-		case 3:
-			score = incThird;
-		case 4:
-			score = incOther;
+		for (int i = 0; i < authorNum; i++) {
+			total += 1.0 / (i + 1);
 		}
+		Double score = (1.0 / seq) / total;
 		return score;
 	}
 
@@ -258,10 +248,53 @@ public class BuildAllMessIndex {
 		}
 	}
 
-	double orgQueryEva(String orgs, int seq) {
+	void orgQueryEva(String isAcademic, String[]... type) {
+		OrgrankOrgService oos = new OrgrankOrgService();
+		List<String> ids = oos.queryScore(isAcademic, "scoreCount").subList(0, 10);
+		List<HashMap<Integer, Double[]>> ans=new ArrayList<HashMap<Integer,Double[]>>();
+		//Tex
+		System.out.println("\\begin{tabular}{|r|l|l|l|l|l|l|l|l|l|l|}\\hline");
+		System.out.print("orgName");
+		for(int i=2004;i<2014;i++){
+			System.out.print(" & "+i);
+		}
+		System.out.println("\\\\\\hline");
+		for (String id : ids) {
+			String metas = oos.queryMetaById(String.valueOf(id)).get(0);
+			String orgs = metas.split("\t")[2];
+			HashMap<Integer, Double[]> res = new HashMap<Integer, Double[]>();
+			System.out.print(metas.split("\t")[1]);
+			for (int y = 2004; y < 2014; y++) {
+				Double[] sum = { 0.0, 0.0, 0.0, 0.0, 0.0 };
+				Double[] result1 = orgQueryYear(0, orgs,y, type);
+				sum[0] = result1[0];// paper num
+				sum[3] = result1[2];// sum paper cite
+				for (int i = 0; i < 4; i++) {
+					Double[] result = orgQueryYear(i + 1, orgs,y ,type);
+					if (i == 0) {
+						sum[1] = result[0];
+					}
+					sum[2] += result[1];// reg paper num
+					sum[4] += result[2];// reg sum paper cite
+
+				}
+				System.out.print(" & "+sum[0]);
+				if(y==2013)
+					System.out.println();
+//					System.out.println(" \\\\\\hline ");
+				res.put(y, sum);
+			}
+			ans.add(res);
+		}
+		System.out.println("\\end{tabular}");
+
+		
+	}
+
+	Double[] orgQueryYear(int seq, String orgs, int year, String[]... type) {
 		IndexReader indexReader = null;
 		IndexSearcher indexSearcher = null;
-		Double result = 0.0;
+		Double[] result = { 0.0, 0.0, 0.0, 0.0 };
 		try {
 			indexReader = DirectoryReader.open(FSDirectory.open(indexFileSql));
 			Sort sort = new Sort(new SortField[] { new SortField("id",
@@ -269,42 +302,78 @@ public class BuildAllMessIndex {
 			// 创建搜索类
 			indexSearcher = new IndexSearcher(indexReader);
 			BooleanQuery query = new BooleanQuery();
-			String[] name = orgs.split("\t");
+
+			PhraseQuery yearQuery = new PhraseQuery();
+			yearQuery.add(new Term("year", String.valueOf(year)));
+			query.add(new BooleanClause(yearQuery, Occur.MUST));
+
+			String[] name = orgs.split(";");
+			BooleanQuery subQuery = new BooleanQuery();
 			for (int i = 0; i < name.length; i++) {
-				BooleanQuery subQuery;
+				BooleanQuery subsubQuery;
 				switch (seq) {
 				case 1:
-					subQuery = parseKeyword("firstAuthorOrg", name[i]);
-					query.add(new BooleanClause(subQuery, Occur.SHOULD));
+					subsubQuery = parseKeyword("firstAuthorOrg", name[i]);
+					subQuery.add(new BooleanClause(subsubQuery, Occur.SHOULD));
 					break;
 				case 2:
-					subQuery = parseKeyword("secordAuthorOrg", name[i]);
-					query.add(new BooleanClause(subQuery, Occur.SHOULD));
+					subsubQuery = parseKeyword("secordAuthorOrg", name[i]);
+					subQuery.add(new BooleanClause(subsubQuery, Occur.SHOULD));
 					break;
 				case 3:
-					subQuery = parseKeyword("thirdAuthorOrg", name[i]);
-					query.add(new BooleanClause(subQuery, Occur.SHOULD));
+					subsubQuery = parseKeyword("thirdAuthorOrg", name[i]);
+					subQuery.add(new BooleanClause(subsubQuery, Occur.SHOULD));
 					break;
 				case 4:
-					subQuery = parseKeyword("otherAuthorOrg", name[i]);
-					query.add(new BooleanClause(subQuery, Occur.SHOULD));
+					subsubQuery = parseKeyword("otherAuthorOrg", name[i]);
+					subQuery.add(new BooleanClause(subsubQuery, Occur.SHOULD));
 					break;
 				default:
+					subsubQuery = parseKeyword("firstAuthorOrg", name[i]);
+					subQuery.add(new BooleanClause(subsubQuery, Occur.SHOULD));
+					subsubQuery = parseKeyword("secordAuthorOrg", name[i]);
+					subQuery.add(new BooleanClause(subsubQuery, Occur.SHOULD));
+					subsubQuery = parseKeyword("thirdAuthorOrg", name[i]);
+					subQuery.add(new BooleanClause(subsubQuery, Occur.SHOULD));
+					subsubQuery = parseKeyword("otherAuthorOrg", name[i]);
+					subQuery.add(new BooleanClause(subsubQuery, Occur.SHOULD));
 					break;
 				}
 			}
-			TopDocs topDocs = indexSearcher.search(query, 10000, sort);
+			query.add(new BooleanClause(subQuery, Occur.MUST));
+			if (type.length > 0) {
+				BooleanQuery subtypeQuery = new BooleanQuery();
+				for (String[] strs : type) {
+					for (String str : strs) {
+						TermQuery termQuery = new TermQuery(new Term("jconf",
+								str));
+						subtypeQuery.add(new BooleanClause(termQuery,
+								Occur.SHOULD));
+					}
+				}
+				query.add(new BooleanClause(subtypeQuery, Occur.MUST));
+			}
+			TopDocs topDocs = indexSearcher.search(query, 5000, sort);
 			ScoreDoc[] scoreDoc = topDocs.scoreDocs;
+			result[0] = scoreDoc.length * 1.0;
 			for (int i = 0; i < scoreDoc.length; i++) {
+				// 内部编号 ,和数据库表中的唯一标识列一样
 				int doc = scoreDoc[i].doc;
 				Document mydoc = indexSearcher.doc(doc);
-				String id = mydoc.get("id");
-				if (!visited.contains(id)) {
-					visited.add(id);
-				}
-				double score = 1;
-				result += score;
+				String author = mydoc.get("author");
+				// System.out.println(mydoc.get("firstAuthorOrg")+"  "+mydoc.get("nCite"));
+				int authorNum = author.split(";").length;
+				double nCitation = 1;
+				String tempCite = mydoc.get("nCite");
+				result[1] += calculateScore(seq, authorNum, nCitation);
+				nCitation = (Integer.parseInt(tempCite) > 1) ? Integer
+						.parseInt(tempCite) : 1;
+				result[2] += calculateScore(seq, authorNum, nCitation);
+
 			}
+			// // 调试用注释
+			// System.out.println(query.toString());
+			// //--------
 		} catch (CorruptIndexException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -335,68 +404,74 @@ public class BuildAllMessIndex {
 			indexSearcher = new IndexSearcher(indexReader);
 			BooleanQuery query = new BooleanQuery();
 			String[] name = orgs.split(";");
+			BooleanQuery subQuery = new BooleanQuery();
 			for (int i = 0; i < name.length; i++) {
-				BooleanQuery subQuery;
+				BooleanQuery subsubQuery;
 				switch (seq) {
 				case 1:
-					subQuery = parseKeyword("firstAuthorOrg", name[i]);
-					query.add(new BooleanClause(subQuery, Occur.SHOULD));
+					subsubQuery = parseKeyword("firstAuthorOrg", name[i]);
+					subQuery.add(new BooleanClause(subsubQuery, Occur.SHOULD));
 					break;
 				case 2:
-					subQuery = parseKeyword("secordAuthorOrg", name[i]);
-					query.add(new BooleanClause(subQuery, Occur.SHOULD));
+					subsubQuery = parseKeyword("secordAuthorOrg", name[i]);
+					subQuery.add(new BooleanClause(subsubQuery, Occur.SHOULD));
 					break;
 				case 3:
-					subQuery = parseKeyword("thirdAuthorOrg", name[i]);
-					query.add(new BooleanClause(subQuery, Occur.SHOULD));
+					subsubQuery = parseKeyword("thirdAuthorOrg", name[i]);
+					subQuery.add(new BooleanClause(subsubQuery, Occur.SHOULD));
 					break;
 				case 4:
-					subQuery = parseKeyword("otherAuthorOrg", name[i]);
-					query.add(new BooleanClause(subQuery, Occur.SHOULD));
+					subsubQuery = parseKeyword("otherAuthorOrg", name[i]);
+					subQuery.add(new BooleanClause(subsubQuery, Occur.SHOULD));
 					break;
 				default:
+					subsubQuery = parseKeyword("firstAuthorOrg", name[i]);
+					subQuery.add(new BooleanClause(subsubQuery, Occur.SHOULD));
+					subsubQuery = parseKeyword("secordAuthorOrg", name[i]);
+					subQuery.add(new BooleanClause(subsubQuery, Occur.SHOULD));
+					subsubQuery = parseKeyword("thirdAuthorOrg", name[i]);
+					subQuery.add(new BooleanClause(subsubQuery, Occur.SHOULD));
+					subsubQuery = parseKeyword("otherAuthorOrg", name[i]);
+					subQuery.add(new BooleanClause(subsubQuery, Occur.SHOULD));
 					break;
 				}
 			}
+			query.add(new BooleanClause(subQuery, Occur.MUST));
 			if (type.length > 0) {
-				BooleanQuery subQuery = new BooleanQuery();
+				BooleanQuery subtypeQuery = new BooleanQuery();
 				for (String[] strs : type) {
 					for (String str : strs) {
 						TermQuery termQuery = new TermQuery(new Term("jconf",
 								str));
-						subQuery.add(new BooleanClause(termQuery, Occur.SHOULD));
+						subtypeQuery.add(new BooleanClause(termQuery,
+								Occur.SHOULD));
 					}
 				}
-				query.add(new BooleanClause(subQuery, Occur.MUST));
+				query.add(new BooleanClause(subtypeQuery, Occur.MUST));
 			}
-//			 System.out.println(query.toString());
+			// System.out.println(query.toString());
 
 			TopDocs topDocs = indexSearcher.search(query, 5000, sort);
 			ScoreDoc[] scoreDoc = topDocs.scoreDocs;
+			result[0] = scoreDoc.length * 1.0;
 			for (int i = 0; i < scoreDoc.length; i++) {
 				// 内部编号 ,和数据库表中的唯一标识列一样
 				int doc = scoreDoc[i].doc;
 				Document mydoc = indexSearcher.doc(doc);
 				String author = mydoc.get("author");
-//				 System.out.println( mydoc.get("content"));
+				// System.out.println(mydoc.get("firstAuthorOrg")+"  "+mydoc.get("nCite"));
 				int authorNum = author.split(";").length;
 				double nCitation = 1;
-				result[0]++;
-				result[1] += calculateScore(seq, authorNum, nCitation);
 				String tempCite = mydoc.get("nCite");
-				try {
-					nCitation = (Integer.parseInt(tempCite) > 1) ? Integer
-							.parseInt(tempCite) : 1;
-					result[2] += calculateScore(seq, authorNum, nCitation);
-					nCitation = (10 * Math.log10(nCitation));
-					nCitation = (nCitation > 1) ? nCitation : 1;
-					result[3] += calculateScore(seq, authorNum, nCitation);
-				} catch (Exception ae) {
+				result[1] += calculateScore(seq, authorNum, nCitation);
+				nCitation = (Integer.parseInt(tempCite) > 1) ? Integer
+						.parseInt(tempCite) : 1;
+				result[2] += calculateScore(seq, authorNum, nCitation);
 
-				}
 			}
 			// // 调试用注释
-			// System.out.println(query.toString());
+			// System.out.println(result[0] + "  " + result[1] + "  " +
+			// result[2]);
 			// //--------
 		} catch (CorruptIndexException e) {
 			e.printStackTrace();
@@ -419,7 +494,7 @@ public class BuildAllMessIndex {
 	List<Publication> getPubsByOrg(int seq, String orgs, String[]... type) {
 		IndexReader indexReader = null;
 		IndexSearcher indexSearcher = null;
-		List<Publication> result = new Vector<Publication>();
+		List<Publication> result = new ArrayList<Publication>();
 		try {
 			indexReader = DirectoryReader.open(FSDirectory.open(indexFileSql));
 			Sort sort = new Sort(new SortField[] { new SortField("year",
@@ -427,7 +502,8 @@ public class BuildAllMessIndex {
 			// 创建搜索类
 			indexSearcher = new IndexSearcher(indexReader);
 			BooleanQuery query = new BooleanQuery();
-			String[] name = orgs.split("\t");
+			String[] name = orgs.split(";");
+			BooleanQuery subquery = new BooleanQuery();
 			for (int i = 0; i < name.length; i++) {
 				BooleanQuery subQuery;
 				switch (seq) {
@@ -448,6 +524,7 @@ public class BuildAllMessIndex {
 					query.add(new BooleanClause(subQuery, Occur.MUST));
 					break;
 				default:
+					// BooleanQuery subquery = new BooleanQuery();
 					query.add(new BooleanClause(parseKeyword("firstAuthorOrg",
 							name[i]), Occur.SHOULD));
 					query.add(new BooleanClause(parseKeyword("secordAuthorOrg",
@@ -456,25 +533,26 @@ public class BuildAllMessIndex {
 							name[i]), Occur.SHOULD));
 					query.add(new BooleanClause(parseKeyword("otherAuthorOrg",
 							name[i]), Occur.SHOULD));
+					// query.add(new BooleanClause(subqu ery, Occur.MUST));
 					break;
 				}
 			}
+			// query.add(new BooleanClause(subQuery, Occur.MUST));
 			if (type.length > 0) {
-				BooleanQuery subQuery = new BooleanQuery();
+				BooleanQuery subtypeQuery = new BooleanQuery();
 				for (String[] strs : type) {
 					for (String str : strs) {
 						TermQuery termQuery = new TermQuery(new Term("jconf",
 								str));
-						subQuery.add(new BooleanClause(termQuery, Occur.SHOULD));
+						subtypeQuery.add(new BooleanClause(termQuery,
+								Occur.SHOULD));
 					}
 				}
-				query.add(new BooleanClause(subQuery, Occur.MUST));
+				query.add(new BooleanClause(subtypeQuery, Occur.MUST));
 			}
-			// System.out.println(query.toString());
 
 			TopDocs topDocs = indexSearcher.search(query, 5000, sort);
 			ScoreDoc[] scoreDoc = topDocs.scoreDocs;
-			// System.out.println(scoreDoc.length);
 			for (int i = 0; i < scoreDoc.length; i++) {
 				// 内部编号 ,和数据库表中的唯一标识列一样
 				int doc = scoreDoc[i].doc;
@@ -486,7 +564,12 @@ public class BuildAllMessIndex {
 				pub.authors = content.split("\t")[2];
 				pub.year = mydoc.get("year");
 				pub.jconf = mydoc.get("jonf");
+//				pub.firstAuthorOrg=mydoc.get("firstAuthorOrg");
+				
 				pub.nCite = mydoc.get("nCite");
+//				if(pub.year.equals("2013"))
+//				System.out.println(pub.nCite);
+
 				result.add(pub);
 			}
 		} catch (CorruptIndexException e) {
@@ -621,7 +704,7 @@ public class BuildAllMessIndex {
 						Field.Store.YES));
 				doc.add(new StringField("nPage",
 						String.valueOf(pub.getNpage()), Field.Store.YES));
-				doc.add(new StringField("nCite", pub.nCite, Field.Store.YES));
+				doc.add(new IntField("nCite", pub.getNcite(), Field.Store.YES));
 				doc.add(new TextField("content", pub.toString(),
 						Field.Store.YES));
 				indexWriter.addDocument(doc);
