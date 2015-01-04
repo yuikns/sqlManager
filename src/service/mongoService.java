@@ -39,6 +39,7 @@ public class MongoService {
 
 	public void insert(List<DBObject> list) {
 		String collectionName = "orgranktest";
+//		String collectionName = "orgrank";
 		DBCollection dbc = getCollection(collectionName);
 		dbc.insert(list);
 

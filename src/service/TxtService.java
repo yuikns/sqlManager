@@ -244,7 +244,7 @@ public class TxtService {
 		return lcs / (Math.min(m, n));
 	}
 
-	void writeLineInFile(ArrayList<String> lines, String fileName)
+	public void writeLineInFile(List<String> lines, String fileName)
 			throws IOException {
 		PrintWriter writer = new PrintWriter(new OutputStreamWriter(
 				new FileOutputStream(//

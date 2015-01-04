@@ -18,11 +18,15 @@ public class OrgrankOrgService extends SqlService {
 		String[] col = { "idOrg"};
 		String where;
 		if(isAcademic.equals("3")){
-		where= String.format("order by `%s`",sortOrder);
+		where= String.format("order by `%s` desc",sortOrder);
 		}else{
-		where = String.format("where `type`=%s order by `%s` desc limit 10",isAcademic,sortOrder);
+		where = String.format("where `type`=%s order by `%s` desc",isAcademic,sortOrder);
 		}
 		return query(dbName, tableName, where, col);
+	}
+	public List<String> queryAvgNciteByYear(int year){
+		String sql=String.format("SELECT avg(nCite) FROM `orgranktest`.`paper_copy` where nCite>0 and `year`=%s", year);
+		return queryDIY(dbName, sql, 1);
 	}
 	public List<String> queryMeta(String... type) {
 		String[] col = { "idorg", "org", "orgClusterText", "type" };

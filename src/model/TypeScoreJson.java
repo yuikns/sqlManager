@@ -5,7 +5,9 @@ public class TypeScoreJson {
 	String countReg;
 	String cite;
 	String citeLog;
+	String aminerScore;
 	String firstAuthorNum;
+	String aIndex;
 	public String getCount() {
 		return this.count;
 	}
@@ -42,5 +44,19 @@ public class TypeScoreJson {
 
 	public void setFirstAuthorNum(String firstAuthorNum) {
 		this.firstAuthorNum=firstAuthorNum;
+	}
+	public String getAminerScore() {
+		return this.aminerScore;
+	}
+
+	public void setAmierScore(String aminerScore) {
+		this.aminerScore=aminerScore;
+	}
+	public String getAIndex() {
+		return this.aIndex;
+	}
+
+	public void setAIndex(String aIndex) {
+		this.aIndex=aIndex;
 	}
 }

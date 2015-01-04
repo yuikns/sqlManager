@@ -33,6 +33,7 @@ public class JsonService {
 	}
 
 	public String toOrgJson(String meta, String line) {
+		int scoreColumns=7;
 		OrgJson oj = new OrgJson();
 		String[] metas = meta.split("\t");
 		String[] strs = line.split("\t");
@@ -40,15 +41,17 @@ public class JsonService {
 		oj.setOrg(metas[1]);
 		oj.setOrgClusterText(metas[2]);
 		oj.setIsAcademic(metas[3]);
-		int n = (strs.length) / 5;
+		int n = (strs.length) / scoreColumns;
 		List<TypeScoreJson> tsjs = new ArrayList<TypeScoreJson>();
 		for (int i = 0; i < n; i++) {
 			TypeScoreJson tsj = new TypeScoreJson();
-			tsj.setCount(strs[i * 5]);
-			tsj.setFirstAuthorNum(strs[i * 5 + 1]);
-			tsj.setCountReg(strs[i * 5 + 2]);
-			tsj.setCite(strs[i * 5 + 3]);
-			tsj.setCiteLog(strs[i * 5 + 4]);
+			tsj.setCount(strs[i * scoreColumns]);
+			tsj.setFirstAuthorNum(strs[i * scoreColumns + 1]);
+			tsj.setCountReg(strs[i * scoreColumns + 2]);
+			tsj.setCite(strs[i * scoreColumns + 3]);
+			tsj.setCiteLog(strs[i * scoreColumns + 4]);
+			tsj.setAmierScore(strs[i * scoreColumns + 5]);
+			tsj.setAIndex(strs[i * scoreColumns + 6]);
 			tsjs.add(tsj);
 		}
 		oj.setTypeScore(tsjs);

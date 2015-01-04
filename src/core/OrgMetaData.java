@@ -36,7 +36,7 @@ public class OrgMetaData {
 	String[] type7 = { "ACM MM", "SIGGRAPH", "VIS" };
 	String[] type8 = { "AAAI", "CVPR", "ICCV", "ICML", "IJCAI" };
 	String[] type9 = { "CHI", "UbiComp" };
-	String[] type10 = { "RTSS" };
+	String[] type10 = { "RTSS " };
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -45,7 +45,9 @@ public class OrgMetaData {
 		// omd.updateScore();
 		// omd.updateMeta();
 		// omd.insertOneMeta(row);
-		// omd.getOrgRankList(1);
+//		for(int i=0;i<11;i++){
+//		 omd.getOrgRankList(i);
+//		 }
 //		omd.updateScore(omd.getOrgRankList(0), "org");
 		// omd.queryPublicationById(297, 0, 1000);
 		 omd.exportData();
@@ -174,7 +176,7 @@ public class OrgMetaData {
 		List<List<String>> resi = new ArrayList<List<String>>();
 		int tableNum =11;
 		for (int j = 0; j < tableNum; j++) {
-			resi.add(getOrgRankList(j));
+			resi.add(getOrgRankListNew(j));
 		}
 		for (int i = 0; i < res.size(); i++) {
 			StringBuilder sb = new StringBuilder();
@@ -194,51 +196,83 @@ public class OrgMetaData {
 		MongoService ms = new MongoService();
 		ms.insertOrgJsonIntoMongo(gsons);
 	}
-
-	public List<String> getOrgRankList(int n) {
-		List<String> res = null;
-		BuildAllMessIndex bami = new BuildAllMessIndex();
+	public List<String> getOrgRankListNew(int n) {
+		String filePath;
+		List<String> util=new ArrayList<String>();
+		List<String> res=new ArrayList<String>();
+		filePath=String.format("score%s.txt", n);
 		try {
-			switch (n) {
-			case 1:
-				res = bami.countOrg(type1);
-				break;
-			case 2:
-				res = bami.countOrg(type2);
-				break;
-			case 3:
-				res = bami.countOrg(type3);
-				break;
-			case 4:
-				res = bami.countOrg(type4);
-				break;
-			case 5:
-				res = bami.countOrg(type5);
-				break;
-			case 6:
-				res = bami.countOrg(type6);
-				break;
-			case 7:
-				res = bami.countOrg(type7);
-				break;
-			case 8:
-				res = bami.countOrg(type8);
-				break;
-			case 9:
-				res = bami.countOrg(type9);
-				break;
-			case 10:
-				res = bami.countOrg(type10);
-				break;
-			default:
-				res = bami.countOrg();
+			TxtService.getStringList(filePath, util);
+			Collections.sort(util, new Comparator<String>(){
+				@Override
+				public int compare(String o1, String o2) {
+					// TODO Auto-generated method stub
+					Integer id1=Integer.parseInt(o1.split("\t")[0]);
+					Integer id2=Integer.parseInt(o2.split("\t")[0]);
+					return id1.compareTo(id2);
+				}
+			});
+			for(String str:util){
+				int beginIndex=0;
+				int endIndex=str.length()-1;
+				char[] array=str.toCharArray();
+				for(int count=0;beginIndex<str.length();beginIndex++){
+					if(array[beginIndex]=='\t'){
+						count++;
+					}
+					if(count>=3){
+						break;
+					}
+				}
+				for(;array[endIndex]=='\t';endIndex--){
+					
+				}
+				res.add(str.substring(beginIndex+1,endIndex+1));
 			}
-			return res;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return new ArrayList<String>();
 		}
+		return res;
+	}
+	public List<String> getOrgRankList(int n) {
+		List<String> res = null;
+		BuildAllMessIndex bami = new BuildAllMessIndex();
+		switch (n) {
+		case 1:
+			res = bami.countOrgNew(type1);
+			break;
+		case 2:
+			res = bami.countOrgNew(type2);
+			break;
+		case 3:
+			res = bami.countOrgNew(type3);
+			break;
+		case 4:
+			res = bami.countOrgNew(type4);
+			break;
+		case 5:
+			res = bami.countOrgNew(type5);
+			break;
+		case 6:
+			res = bami.countOrgNew(type6);
+			break;
+		case 7:
+			res = bami.countOrgNew(type7);
+			break;
+		case 8:
+			res = bami.countOrgNew(type8);
+			break;
+		case 9:
+			res = bami.countOrgNew(type9);
+			break;
+		case 10:
+			res = bami.countOrgNew(type10);
+			break;
+		default:
+			res = bami.countOrgNew();
+		}
+		return res;
 
 	}
 
