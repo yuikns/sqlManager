@@ -81,7 +81,7 @@ public class BuildAllMessIndex {
 	public static void main(String[] args) throws IOException, Exception {
 		BuildAllMessIndex bami = new BuildAllMessIndex();
 		// bami.readExcel(".\\res\\List720 - 副本.xls");
-		// bami.readSql();
+		 bami.readSql();
 //		 bami.openIndexFile("RTSS ");
 		// bami.pubQuery(
 		// "Public Key Encryption with Keyword Search",
@@ -99,37 +99,6 @@ public class BuildAllMessIndex {
 
 	}
 
-	// List<String> countOrg(String[]... type) throws IOException {
-	// List<String> res = new Vector<String>();
-	// OrgrankOrgService oos = new OrgrankOrgService();
-	// List<String> metaList = oos.queryMeta();
-	// for (String line : metaList) {
-	// StringBuilder sb = new StringBuilder();
-	// String orgs = line.split("\t")[2];
-	// // String id = line.split("\t")[0];
-	// // sb.append(id + "\t");
-	// // sb.append(org + "\t");
-	// Double[] sum = { 0.0, 0.0, 0.0, 0.0,0.0 };
-	// System.out.println(orgs);
-	// Double[] result1 = orgQuery(0, orgs, type);
-	// sum[0] = result1[0];// paper num
-	// sum[3] = result1[2];// sum paper cite
-	// for (int i = 0; i < 4; i++) {
-	// Double[] result = orgQuery(i + 1, orgs, type);
-	// if(i==0){
-	// sum[4]=result[0];
-	// }
-	// sum[1] += result[1];// reg paper num
-	// sum[2] += result[2];// reg sum paper cite
-	//
-	// }
-	// sb.append(sum[0] + "\t"+sum[4]+"\t" + sum[1] + "\t" + sum[3] + "\t" +
-	// sum[2]);
-	// res.add(sb.toString());
-	// System.out.println(sb.toString());
-	// }
-	// return res;
-	// }
 	List<String> countOrg(String[]... type) throws IOException {
 		List<String> res = new Vector<String>();
 		OrgrankOrgService oos = new OrgrankOrgService();
@@ -765,11 +734,7 @@ public class BuildAllMessIndex {
 	public void readSql() {
 		Directory directory = null;
 		IndexWriter indexWriter = null;
-		BufferedWriter bw = null;
 		try {
-			java.util.Date time = new Date();
-			String logFile = ".\\res\\log" + time.getTime();
-			bw = new BufferedWriter(new FileWriter(logFile));
 			IndexWriterConfig indexWriterConfig = new IndexWriterConfig(
 					Version.LUCENE_43, analyzer);
 			// 创建磁盘目录对象
@@ -783,7 +748,6 @@ public class BuildAllMessIndex {
 				// indexWriter添加索引
 				Document doc = new Document();
 				Publication pub = a.get(j);
-				bw.write(pub.toString() + "\r\n");
 				doc.add(new StringField("id", pub.id, Field.Store.YES));
 				doc.add(new TextField("author", pub.getAuthors(),
 						Field.Store.YES));
@@ -819,13 +783,6 @@ public class BuildAllMessIndex {
 			if (directory != null) {
 				try {
 					directory.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			if (bw != null) {
-				try {
-					bw.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
