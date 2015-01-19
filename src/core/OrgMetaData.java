@@ -176,7 +176,7 @@ public class OrgMetaData {
 		List<List<String>> resi = new ArrayList<List<String>>();
 		int tableNum =11;
 		for (int j = 0; j < tableNum; j++) {
-			resi.add(getOrgRankListNew(j));
+			resi.add(getOrgRankList(j));
 		}
 		for (int i = 0; i < res.size(); i++) {
 			StringBuilder sb = new StringBuilder();
@@ -194,9 +194,10 @@ public class OrgMetaData {
 			gsons.add(output);
 		}
 		MongoService ms = new MongoService();
-//		ms.insertOrgJsonIntoMongo(gsons);
+		ms.insertOrgJsonIntoMongo(gsons);
 	}
 	public List<String> getOrgRankListNew(int n) {
+		//read from scoreX.txt
 		String filePath;
 		List<String> util=new ArrayList<String>();
 		List<String> res=new ArrayList<String>();
@@ -206,12 +207,15 @@ public class OrgMetaData {
 			Collections.sort(util, new Comparator<String>(){
 				@Override
 				public int compare(String o1, String o2) {
-					// TODO Auto-generated method stub
+					// sort records by idorg
 					Integer id1=Integer.parseInt(o1.split("\t")[0]);
 					Integer id2=Integer.parseInt(o2.split("\t")[0]);
 					return id1.compareTo(id2);
 				}
 			});
+			//remove org meta data, and only remains scores
+			//beginIndex should be the 4th column
+			//endIndex should be the last column ,here we suppose the last column has a '\t' followed it
 			for(String str:util){
 				int beginIndex=0;
 				int endIndex=str.length()-1;
