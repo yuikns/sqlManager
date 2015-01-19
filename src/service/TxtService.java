@@ -122,8 +122,8 @@ public class TxtService {
 
 	static public void getStringList(String filePath, List<String> util)
 			throws IOException {
-//		File txt = new File(filePath);
-//		BufferedReader in = new BufferedReader(new FileReader(txt));
+//		read inputStream from file and saved into a util by line
+		
 		BufferedReader in = new BufferedReader(
 				new InputStreamReader(new FileInputStream(filePath), "UTF-8"));
 		if (null != in) {

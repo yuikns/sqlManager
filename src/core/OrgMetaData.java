@@ -194,7 +194,7 @@ public class OrgMetaData {
 			gsons.add(output);
 		}
 		MongoService ms = new MongoService();
-		ms.insertOrgJsonIntoMongo(gsons);
+//		ms.insertOrgJsonIntoMongo(gsons);
 	}
 	public List<String> getOrgRankListNew(int n) {
 		String filePath;

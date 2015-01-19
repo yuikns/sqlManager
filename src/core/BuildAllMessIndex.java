@@ -81,7 +81,7 @@ public class BuildAllMessIndex {
 	public static void main(String[] args) throws IOException, Exception {
 		BuildAllMessIndex bami = new BuildAllMessIndex();
 		// bami.readExcel(".\\res\\List720 - 副本.xls");
-		 bami.readSql();
+//		 bami.readSql();
 //		 bami.openIndexFile("RTSS ");
 		// bami.pubQuery(
 		// "Public Key Encryption with Keyword Search",
@@ -91,9 +91,9 @@ public class BuildAllMessIndex {
 		// bami.countOrg();
 		// bami.doSomeTask();
 		// bami.orgQueryEva("0");
-//		String[] type10 = { "SIGKDD" };
+		String[] type10 = { "SIGKDD" };
 //		bami.orgQuery(0, "microsoft", type10);
-		// bami.countOrgNew(type10);
+		 bami.countOrgNew(type10);
 		// List<Publication>res=bami.getPubsByOrg(0,
 		// "microsoft");
 
