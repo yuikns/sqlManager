@@ -72,7 +72,7 @@ before insert json data into mongo, it will print debug message every 20 orgnaiz
 
 *getOrgRankListNew(int n)*
 
-n(range from 0 to 10) is the No. of table 
+n(range from 0 to 10) is #table 
 
 
 ### service
@@ -87,15 +87,17 @@ sql function share common return type as list of string which col-elems seperate
 
 SELECT `idorg`, `org`, `orgClusterText`, `type` FROM orgranktest.org WHERE type...
 
-idorg(integer range from 1-1000+) eg. Tsinghua has idorg of 12
-org(string) means standard form of organization name.
-orgClusterText(string) several writing forms for a organiztion seperated by ';'
-type(integer) means academic, industry, research center, or all 
+-idorg(integer range from 1-1000+) eg. Tsinghua has idorg of 12
+-org(string) means standard form of organization name.
+-orgClusterText(string) several writing forms for a organiztion seperated by ';'
+-type(integer) means academic, industry, research center, or all 
 
 *queryMetaById((String Id)*
+
 SELECT `idorg`, `org`, `orgClusterText` FROM orgranktest.org WHERE `idorg`=...
 
 *queryScore(String isAcademic,String sortOrder)*
+
 SELECT `idOrg` FROM orgranktest.org WHERE type=... ORDER BY ...
 
 **MongoService**
