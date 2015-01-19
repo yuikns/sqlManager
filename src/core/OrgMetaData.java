@@ -2,16 +2,11 @@ package core;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.core.SimpleAnalyzer;
-import org.apache.lucene.util.Version;
 
 import com.google.gson.Gson;
 
@@ -19,7 +14,6 @@ import model.Org;
 import model.OrgJson;
 import model.Publication;
 
-import service.ExcelService;
 import service.JsonService;
 import service.MongoService;
 import service.OrgrankOrgService;
@@ -197,6 +191,7 @@ public class OrgMetaData {
 		ms.insertOrgJsonIntoMongo(gsons);
 	}
 	public List<String> getOrgRankListNew(int n) {
+		//./should exists some files named scoreX.txt
 		//read from scoreX.txt
 		String filePath;
 		List<String> util=new ArrayList<String>();
